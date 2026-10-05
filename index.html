@@ -10,7 +10,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4f46e5">
     <link rel="apple-touch-icon" href="https://placehold.co/180x180/4f46e5/ffffff?text=AC">
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Dorm AC Tracker","short_name":"AC Tracker","display":"standalone","background_color":"#f3f4f6","theme_color":"#4f46e5","icons":[{"src":"https://placehold.co/192x192/4f46e5/ffffff?text=AC","sizes":"192x192","type":"image/png"},{"src":"https://placehold.co/512x512/4f46e5/ffffff?text=AC","sizes":"512x512","type":"image/png"}]}'>
+    
+    <!-- We will inject the manifest dynamically via JS to satisfy Chrome's strict rules -->
+    <link id="pwa-manifest" rel="manifest">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -926,6 +928,48 @@
                  .replace(/'/g, "&#039;");
         }
 
+        function setupPWA() {
+            // 1. Generate a strict manifest that satisfies Android Chrome
+            const manifest = {
+                "name": "Dorm AC Tracker",
+                "short_name": "AC Tracker",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#f3f4f6",
+                "theme_color": "#4f46e5",
+                "icons": [
+                    {
+                        "src": "https://placehold.co/192x192/4f46e5/ffffff/png?text=AC",
+                        "sizes": "192x192",
+                        "type": "image/png"
+                    },
+                    {
+                        "src": "https://placehold.co/512x512/4f46e5/ffffff/png?text=AC",
+                        "sizes": "512x512",
+                        "type": "image/png"
+                    }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+            document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+
+            // 2. Generate and register a Service Worker (Required for Android Install Prompt)
+            if ('serviceWorker' in navigator) {
+                // A minimal service worker that just listens for fetch events to pass the PWA check
+                const swCode = `
+                    self.addEventListener('install', (event) => self.skipWaiting());
+                    self.addEventListener('fetch', (event) => {});
+                `;
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(() => console.log("PWA Service Worker ready!"))
+                    .catch(err => console.error("PWA Service Worker failed:", err));
+            }
+        }
+
+        setupPWA();
         initialize();
 
     </script>
