@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4f46e5">
-    <link rel="apple-touch-icon" href="https://placehold.co/180x180/4f46e5/ffffff?text=AC">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%234f46e5' rx='112'/%3E%3Crect x='112' y='176' width='288' height='128' fill='%23ffffff' rx='24'/%3E%3Crect x='144' y='272' width='224' height='16' fill='%23c7d2fe' rx='8'/%3E%3Cline x1='152' y1='216' x2='304' y2='216' stroke='%23c7d2fe' stroke-width='16' stroke-linecap='round'/%3E%3Cline x1='152' y1='244' x2='304' y2='244' stroke='%23c7d2fe' stroke-width='16' stroke-linecap='round'/%3E%3Ccircle cx='360' cy='230' r='16' fill='%23c7d2fe'/%3E%3Cpath d='M160 352 Q180 392 200 352 M236 362 Q256 402 276 362 M312 352 Q332 392 352 352' fill='none' stroke='%23ffffff' stroke-width='16' stroke-linecap='round'/%3E%3C/svg%3E">
     
     <!-- We will inject the manifest dynamically via JS to satisfy Chrome's strict rules -->
     <link id="pwa-manifest" rel="manifest">
@@ -1047,6 +1047,9 @@
         }
 
         function setupPWA() {
+            // Flat Vector SVG Icon encoded as a data URL for perfect offline scaling
+            const acIconSvgUrl = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%234f46e5' rx='112'/%3E%3Crect x='112' y='176' width='288' height='128' fill='%23ffffff' rx='24'/%3E%3Crect x='144' y='272' width='224' height='16' fill='%23c7d2fe' rx='8'/%3E%3Cline x1='152' y1='216' x2='304' y2='216' stroke='%23c7d2fe' stroke-width='16' stroke-linecap='round'/%3E%3Cline x1='152' y1='244' x2='304' y2='244' stroke='%23c7d2fe' stroke-width='16' stroke-linecap='round'/%3E%3Ccircle cx='360' cy='230' r='16' fill='%23c7d2fe'/%3E%3Cpath d='M160 352 Q180 392 200 352 M236 362 Q256 402 276 362 M312 352 Q332 392 352 352' fill='none' stroke='%23ffffff' stroke-width='16' stroke-linecap='round'/%3E%3C/svg%3E";
+
             // 1. Generate a strict manifest that satisfies Android Chrome
             const manifest = {
                 "name": "Dorm AC Tracker",
@@ -1057,14 +1060,16 @@
                 "theme_color": "#4f46e5",
                 "icons": [
                     {
-                        "src": "https://placehold.co/192x192/4f46e5/ffffff/png?text=AC",
+                        "src": acIconSvgUrl,
                         "sizes": "192x192",
-                        "type": "image/png"
+                        "type": "image/svg+xml",
+                        "purpose": "any maskable"
                     },
                     {
-                        "src": "https://placehold.co/512x512/4f46e5/ffffff/png?text=AC",
+                        "src": acIconSvgUrl,
                         "sizes": "512x512",
-                        "type": "image/png"
+                        "type": "image/svg+xml",
+                        "purpose": "any maskable"
                     }
                 ]
             };
