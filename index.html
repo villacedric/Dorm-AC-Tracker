@@ -128,6 +128,11 @@
                 </div>
             </div>
 
+            <!-- Temporary Admin Button -->
+            <button id="admin100HrBtn" class="mt-8 bg-slate-800 text-white text-xs py-2 px-4 rounded-xl opacity-40 hover:opacity-100 transition-opacity mx-auto flex items-center gap-2">
+                <i class="fa-solid fa-wrench"></i> Start Fresh with 100 Hours
+            </button>
+
         </main>
     </div>
 
@@ -692,6 +697,49 @@
                 activityLogChevron.classList.add('rotate-180');
             }
         });
+
+        // --- TEMPORARY ADMIN SCRIPT ---
+        const admin100HrBtn = document.getElementById('admin100HrBtn');
+        if (admin100HrBtn) {
+            admin100HrBtn.addEventListener('click', async () => {
+                if (!confirm("This will add exactly 100 hours to your current cycle. Continue?")) return;
+                
+                const now = Date.now();
+                const past100Hrs = now - (100 * 60 * 60 * 1000); // Exactly 100 hours ago in milliseconds
+
+                try {
+                    admin100HrBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+                    
+                    // 1. Move the reset window back 100 hours
+                    const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config', 'main');
+                    await setDoc(configRef, { lastResetTimestamp: past100Hrs }, { merge: true });
+
+                    // 2. Add a fake ON event 100 hours ago
+                    const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'ac_events');
+                    await addDoc(eventsRef, {
+                        type: 'ON',
+                        timestamp: past100Hrs,
+                        user: 'Admin Adjustment',
+                        userId: 'admin'
+                    });
+
+                    // 3. Add a fake OFF event right now to close the 100hr gap
+                    await addDoc(eventsRef, {
+                        type: 'OFF',
+                        timestamp: now,
+                        user: 'Admin Adjustment',
+                        userId: 'admin'
+                    });
+
+                    alert("Success! 100 hours added. You can now delete this button from the code if you want.");
+                    admin100HrBtn.style.display = 'none';
+                } catch (e) {
+                    alert("Error: " + e.message);
+                    admin100HrBtn.innerHTML = '<i class="fa-solid fa-wrench"></i> Start Fresh with 100 Hours';
+                }
+            });
+        }
+        // ------------------------------
 
         confirmResetBtn.addEventListener('click', async () => {
             if (!currentUser) return;
