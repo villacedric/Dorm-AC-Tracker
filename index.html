@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dorm AC Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .ac-btn-on {
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2);
+            animation: pulse-green 2s infinite;
+        }
+        
+        .ac-btn-off {
+            box-shadow: 0 0 40px rgba(107, 114, 128, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2); }
+            50% { box-shadow: 0 0 50px rgba(16, 185, 129, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2); }
+        }
+
+        /* Custom Scrollbar for the feed */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
+
+    <!-- App Container -->
+    <div class="flex-1 flex flex-col max-w-md w-full mx-auto bg-white shadow-2xl relative">
+        
+        <!-- Header -->
+        <header class="bg-indigo-600 text-white px-6 py-4 flex justify-between items-center z-10 shadow-md rounded-b-2xl">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-snowflake text-xl"></i>
+                <h1 class="font-bold text-lg tracking-wide">Dorm AC</h1>
+            </div>
+            <button id="editNameBtn" class="text-sm bg-indigo-500 hover:bg-indigo-400 px-3 py-1.5 rounded-full transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-user-pen"></i>
+                <span id="headerUserName" class="max-w-[100px] truncate">Setup Profile</span>
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto flex flex-col p-6 space-y-8 pb-20 relative">
+            
+            <!-- AC Status Control -->
+            <div class="flex flex-col items-center justify-center pt-4">
+                <button id="acToggleButton" disabled class="relative w-48 h-48 rounded-full flex flex-col items-center justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none bg-slate-100 border-4 border-slate-200 ac-btn-off">
+                    <i id="acIcon" class="fa-solid fa-power-off text-5xl mb-2 text-slate-400 transition-colors duration-300"></i>
+                    <span id="acStatusText" class="font-bold text-xl text-slate-500 tracking-wider transition-colors duration-300">OFF</span>
+                </button>
+                <div id="acLastAction" class="mt-6 text-sm text-slate-500 text-center min-h-[40px] opacity-0 transition-opacity duration-300">
+                    Loading status...
+                </div>
+            </div>
+
+            <!-- Stats Dashboard -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-blue-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-blue-100">
+                    <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider mb-1">Today</span>
+                    <div class="flex items-baseline gap-1">
+                        <span id="statToday" class="text-3xl font-black text-blue-700">0.0</span>
+                        <span class="text-sm font-medium text-blue-600">hrs</span>
+                    </div>
+                </div>
+                <div class="bg-indigo-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-indigo-100">
+                    <span class="text-xs font-semibold text-indigo-500 uppercase tracking-wider mb-1">This Week</span>
+                    <div class="flex items-baseline gap-1">
+                        <span id="statWeek" class="text-3xl font-black text-indigo-700">0.0</span>
+                        <span class="text-sm font-medium text-indigo-600">hrs</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="flex-1 flex flex-col">
+                <div class="flex justify-between items-end mb-3 px-1">
+                    <h2 class="font-bold text-slate-700">Activity Log</h2>
+                    <span class="text-xs font-medium text-slate-400" id="logCount">0 events</span>
+                </div>
+                <div id="activityFeed" class="flex-1 bg-slate-50 rounded-2xl p-4 border border-slate-100 overflow-y-auto space-y-3 min-h-[150px]">
+                    <!-- Feed items will be injected here -->
+                    <div class="text-center text-sm text-slate-400 py-4 italic">Loading history...</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300">
+        <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center gap-4">
+            <i class="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-600"></i>
+            <p class="text-sm font-semibold text-slate-600">Connecting to Dorm...</p>
+        </div>
+    </div>
+
+    <!-- Name Setup Modal -->
+    <div id="nameModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300" id="nameModalContent">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-user-astronaut text-2xl text-indigo-600"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800">Who's tracking?</h2>
+                <p class="text-sm text-slate-500 mt-1">Enter your name so your dormmates know who turned the AC on or off.</p>
+            </div>
+            <input type="text" id="nameInput" placeholder="e.g., Alex, Room 2B..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium text-center mb-4">
+            <button id="saveNameBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md shadow-indigo-200">
+                Save & Continue
+            </button>
+        </div>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="errorToast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg z-[70] font-medium text-sm flex items-center gap-2 transition-all duration-300 opacity-0 -translate-y-full pointer-events-none">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="errorMsg">Something went wrong.</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Setup
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dorm-ac-tracker-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            // Mock config for syntax fallback if not provided by environment
+            apiKey: "mock", authDomain: "mock", projectId: "mock", storageBucket: "mock", messagingSenderId: "mock", appId: "mock"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app, db, auth;
+        let currentUser = null;
+        let userProfile = { name: "" };
+        let allEvents = [];
+        let isAcOn = false;
+        let isProcessingAction = false;
+        let liveTickerInterval = null;
+
+        // UI Elements
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const nameModal = document.getElementById('nameModal');
+        const nameModalContent = document.getElementById('nameModalContent');
+        const nameInput = document.getElementById('nameInput');
+        const saveNameBtn = document.getElementById('saveNameBtn');
+        const editNameBtn = document.getElementById('editNameBtn');
+        const headerUserName = document.getElementById('headerUserName');
+        
+        const acToggleButton = document.getElementById('acToggleButton');
+        const acIcon = document.getElementById('acIcon');
+        const acStatusText = document.getElementById('acStatusText');
+        const acLastAction = document.getElementById('acLastAction');
+        
+        const statToday = document.getElementById('statToday');
+        const statWeek = document.getElementById('statWeek');
+        const activityFeed = document.getElementById('activityFeed');
+        const logCount = document.getElementById('logCount');
+        const errorToast = document.getElementById('errorToast');
+        const errorMsg = document.getElementById('errorMsg');
+
+        // Helpers
+        function showError(message) {
+            errorMsg.textContent = message;
+            errorToast.classList.remove('opacity-0', '-translate-y-full');
+            errorToast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                errorToast.classList.add('opacity-0', '-translate-y-full');
+                errorToast.classList.remove('opacity-100', 'translate-y-0');
+            }, 3000);
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('opacity-0');
+            setTimeout(() => loadingOverlay.style.display = 'none', 300);
+        }
+
+        async function initialize() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Authenticate
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        await loadUserProfile();
+                        startRealtimeSync();
+                    }
+                });
+
+            } catch (error) {
+                console.error("Initialization error:", error);
+                showError("Failed to connect. Please try again.");
+            }
+        }
+
+        async function loadUserProfile() {
+            // FIXED: Using exactly 4 segments for a valid document reference in Firestore
+            const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid);
+            
+            return new Promise((resolve) => {
+                onSnapshot(profileRef, (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().name) {
+                        userProfile.name = docSnap.data().name;
+                        headerUserName.textContent = userProfile.name;
+                    } else {
+                        // Prompt for name if not set
+                        showNameModal();
+                        headerUserName.textContent = `User ${currentUser.uid.substring(0,4)}`;
+                        userProfile.name = `User ${currentUser.uid.substring(0,4)}`;
+                    }
+                    resolve();
+                }, (error) => {
+                    console.error("Profile sync error:", error);
+                    resolve(); // Resolve anyway to proceed with default name
+                });
+            });
+        }
+
+        function showNameModal() {
+            nameInput.value = userProfile.name.startsWith('User ') ? '' : userProfile.name;
+            nameModal.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                nameModalContent.classList.remove('scale-95');
+                nameModalContent.classList.add('scale-100');
+                nameInput.focus();
+            }, 10);
+        }
+
+        function hideNameModal() {
+            nameModalContent.classList.remove('scale-100');
+            nameModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                nameModal.classList.add('opacity-0', 'pointer-events-none');
+            }, 300);
+        }
+
+        saveNameBtn.addEventListener('click', async () => {
+            const name = nameInput.value.trim();
+            if (!name) return showError("Please enter a name");
+            
+            saveNameBtn.disabled = true;
+            saveNameBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            
+            try {
+                // FIXED: Match the 4-segment path used for loading
+                const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid);
+                await setDoc(profileRef, { name: name }, { merge: true });
+                hideNameModal();
+            } catch (error) {
+                console.error("Error saving name:", error);
+                showError("Could not save name.");
+            } finally {
+                saveNameBtn.disabled = false;
+                saveNameBtn.innerHTML = 'Save & Continue';
+            }
+        });
+
+        editNameBtn.addEventListener('click', showNameModal);
+
+        function startRealtimeSync() {
+            const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'ac_events');
+            
+            onSnapshot(eventsRef, (snapshot) => {
+                const rawEvents = [];
+                snapshot.forEach(doc => {
+                    rawEvents.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Sort chronologically
+                allEvents = rawEvents.sort((a, b) => a.timestamp - b.timestamp);
+                
+                updateAppState();
+                hideLoading();
+            }, (error) => {
+                console.error("Events sync error:", error);
+                showError("Error syncing AC data.");
+                hideLoading();
+            });
+        }
+
+        function updateAppState() {
+            // Determine current status
+            let currentOnEvent = null;
+            let lastEvent = null;
+
+            // Process chronological events to find if currently on
+            allEvents.forEach(evt => {
+                lastEvent = evt;
+                if (evt.type === 'ON') {
+                    currentOnEvent = evt;
+                } else if (evt.type === 'OFF') {
+                    currentOnEvent = null;
+                }
+            });
+
+            isAcOn = currentOnEvent !== null;
+
+            // Update UI components
+            updateMainButton(lastEvent, currentOnEvent);
+            updateStatsUI();
+            updateActivityFeed();
+
+            // Set up ticker to update live stats if AC is ON
+            if (liveTickerInterval) clearInterval(liveTickerInterval);
+            if (isAcOn) {
+                liveTickerInterval = setInterval(() => {
+                    updateStatsUI();
+                }, 60000); // update stats every minute
+            }
+        }
+
+        function updateMainButton(lastEvent, currentOnEvent) {
+            acToggleButton.disabled = false;
+            acLastAction.classList.remove('opacity-0');
+
+            if (isAcOn) {
+                // Style for ON
+                acToggleButton.classList.remove('bg-slate-100', 'border-slate-200', 'ac-btn-off');
+                acToggleButton.classList.add('bg-green-500', 'border-green-400', 'ac-btn-on');
+                
+                acIcon.classList.remove('text-slate-400');
+                acIcon.classList.add('text-white');
+                
+                acStatusText.textContent = 'ON';
+                acStatusText.classList.remove('text-slate-500');
+                acStatusText.classList.add('text-white');
+
+                if (currentOnEvent) {
+                    const timeString = formatRelativeTime(currentOnEvent.timestamp);
+                    acLastAction.innerHTML = `Turned ON by <span class="font-bold text-slate-700">${escapeHtml(currentOnEvent.user)}</span><br>${timeString}`;
+                }
+            } else {
+                // Style for OFF
+                acToggleButton.classList.remove('bg-green-500', 'border-green-400', 'ac-btn-on');
+                acToggleButton.classList.add('bg-slate-100', 'border-slate-200', 'ac-btn-off');
+                
+                acIcon.classList.remove('text-white');
+                acIcon.classList.add('text-slate-400');
+                
+                acStatusText.textContent = 'OFF';
+                acStatusText.classList.remove('text-white');
+                acStatusText.classList.add('text-slate-500');
+
+                if (lastEvent && lastEvent.type === 'OFF') {
+                    const timeString = formatRelativeTime(lastEvent.timestamp);
+                    acLastAction.innerHTML = `Turned OFF by <span class="font-bold text-slate-700">${escapeHtml(lastEvent.user)}</span><br>${timeString}`;
+                } else {
+                    acLastAction.innerHTML = "AC is currently OFF";
+                }
+            }
+        }
+
+        function updateStatsUI() {
+            const stats = calculateUsageStats(allEvents);
+            statToday.textContent = stats.today;
+            statWeek.textContent = stats.week;
+        }
+
+        function calculateUsageStats(events) {
+            const now = Date.now();
+            
+            // Today boundaries
+            const startOfToday = new Date();
+            startOfToday.setHours(0, 0, 0, 0);
+            const todayMs = startOfToday.getTime();
+
+            // This Week boundaries (assuming Monday start)
+            const startOfWeek = new Date(startOfToday);
+            const day = startOfWeek.getDay();
+            const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+            startOfWeek.setDate(diff);
+            const weekMs = startOfWeek.getTime();
+
+            let todayUsage = 0;
+            let weekUsage = 0;
+            let activeStart = null;
+
+            events.forEach(evt => {
+                if (evt.type === 'ON') {
+                    activeStart = evt.timestamp;
+                } else if (evt.type === 'OFF' && activeStart) {
+                    todayUsage += getOverlap(activeStart, evt.timestamp, todayMs, now);
+                    weekUsage += getOverlap(activeStart, evt.timestamp, weekMs, now);
+                    activeStart = null;
+                }
+            });
+
+            // If still on, calculate up to right now
+            if (activeStart) {
+                todayUsage += getOverlap(activeStart, now, todayMs, now);
+                weekUsage += getOverlap(activeStart, now, weekMs, now);
+            }
+
+            return {
+                today: (todayUsage / (1000 * 60 * 60)).toFixed(1),
+                week: (weekUsage / (1000 * 60 * 60)).toFixed(1)
+            };
+        }
+
+        function getOverlap(start, end, windowStart, windowEnd) {
+            const oStart = Math.max(start, windowStart);
+            const oEnd = Math.min(end, windowEnd);
+            return Math.max(0, oEnd - oStart);
+        }
+
+        function updateActivityFeed() {
+            logCount.textContent = `${allEvents.length} events`;
+            
+            if (allEvents.length === 0) {
+                activityFeed.innerHTML = '<div class="text-center text-sm text-slate-400 py-4 italic mt-4">No AC activity logged yet.</div>';
+                return;
+            }
+
+            // Display newest first
+            const reversedEvents = [...allEvents].reverse();
+            
+            let html = '';
+            reversedEvents.forEach(evt => {
+                const isON = evt.type === 'ON';
+                const iconBg = isON ? 'bg-green-100 text-green-600' : 'bg-slate-200 text-slate-500';
+                const iconClass = isON ? 'fa-play' : 'fa-stop';
+                const actionText = isON ? 'Turned ON' : 'Turned OFF';
+                const timeText = formatRelativeTime(evt.timestamp);
+
+                html += `
+                    <div class="flex items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                        <div class="w-10 h-10 ${iconBg} rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                            <i class="fa-solid ${iconClass} text-sm"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-slate-800 truncate">
+                                ${escapeHtml(evt.user)} <span class="font-normal text-slate-500">· ${actionText}</span>
+                            </p>
+                            <p class="text-xs text-slate-400 mt-0.5">${timeText}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            activityFeed.innerHTML = html;
+        }
+
+        acToggleButton.addEventListener('click', async () => {
+            if (!currentUser || isProcessingAction) return;
+            
+            // Prevent fast clicking
+            isProcessingAction = true;
+            acToggleButton.disabled = true;
+            acToggleButton.classList.add('opacity-80', 'scale-95');
+
+            const newAction = isAcOn ? 'OFF' : 'ON';
+            const timestamp = Date.now();
+            
+            try {
+                const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'ac_events');
+                await addDoc(eventsRef, {
+                    type: newAction,
+                    timestamp: timestamp,
+                    user: userProfile.name || `User ${currentUser.uid.substring(0,4)}`,
+                    userId: currentUser.uid
+                });
+                
+            } catch (error) {
+                console.error("Error toggling AC:", error);
+                showError("Failed to update status. Check connection.");
+            } finally {
+                isProcessingAction = false;
+                acToggleButton.classList.remove('opacity-80', 'scale-95');
+            }
+        });
+
+        // Utilities
+        function formatRelativeTime(timestampMs) {
+            const date = new Date(timestampMs);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+            const timeStr = date.toLocaleTimeString([], timeOptions);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} min ago`;
+            
+            const isToday = date.getDate() === now.getDate() && 
+                            date.getMonth() === now.getMonth() && 
+                            date.getFullYear() === now.getFullYear();
+                            
+            if (isToday) return `Today, ${timeStr}`;
+            
+            const yesterday = new Date(now);
+            yesterday.setDate(now.getDate() - 1);
+            const isYesterday = date.getDate() === yesterday.getDate() && 
+                                date.getMonth() === yesterday.getMonth() && 
+                                date.getFullYear() === yesterday.getFullYear();
+                                
+            if (isYesterday) return `Yesterday, ${timeStr}`;
+            
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + `, ${timeStr}`;
+        }
+
+        function escapeHtml(unsafe) {
+            return (unsafe || '').toString()
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        // Start App
+        initialize();
+
+    </script>
+</body>
+</html>
