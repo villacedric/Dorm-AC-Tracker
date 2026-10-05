@@ -146,12 +146,25 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global Setup
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dorm-ac-tracker-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            // Mock config for syntax fallback if not provided by environment
-            apiKey: "mock", authDomain: "mock", projectId: "mock", storageBucket: "mock", messagingSenderId: "mock", appId: "mock"
+        // =========================================================================
+        // 🚨 IMPORTANT: PASTE YOUR FIREBASE CONFIGURATION HERE 🚨
+        // Replace the "YOUR_API_KEY" strings with the ones you get from Firebase
+        // =========================================================================
+        const myCustomFirebaseConfig = {
+            apiKey: "AIzaSyD1_ua2sTTb1ZELPaW2SI0tnu8mGOK6bDs,
+            authDomain: "dorm-ac-tracker.firebaseapp.com",
+            projectId: "dorm-ac-tracker",
+            storageBucket: "dorm-ac-tracker.firebasestorage.app",
+            messagingSenderId: "746576139956",
+            appId: "1:746576139956:web:658be45c5a5dc9045669e1"
         };
+        // =========================================================================
+
+        // (This line ensures it still works in this chat window while you test it, 
+        // but uses your custom config when you upload it to GitHub)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : myCustomFirebaseConfig;
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dorm-ac-tracker-app';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let app, db, auth;
@@ -201,6 +214,14 @@
 
         async function initialize() {
             try {
+                // If user is running this on GitHub but hasn't put in their keys yet
+                if (firebaseConfig.apiKey === "YOUR_API_KEY_HERE") {
+                    document.querySelector('.fa-circle-notch').classList.remove('fa-spin');
+                    document.querySelector('.fa-circle-notch').classList.replace('fa-circle-notch', 'fa-triangle-exclamation');
+                    document.querySelector('#loadingOverlay p').innerHTML = "<b>Database Missing!</b><br>Please follow the guide to add your Firebase config keys in the code.";
+                    return;
+                }
+
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
@@ -222,12 +243,16 @@
 
             } catch (error) {
                 console.error("Initialization error:", error);
-                showError("Failed to connect. Please try again.");
+                showError("Failed to connect. Check your Firebase config.");
+                
+                // Show a more helpful loading screen error
+                document.querySelector('.fa-circle-notch').classList.remove('fa-spin');
+                document.querySelector('.fa-circle-notch').classList.replace('fa-circle-notch', 'fa-triangle-exclamation');
+                document.querySelector('#loadingOverlay p').innerHTML = "<b>Connection Failed.</b><br>Check console for errors.";
             }
         }
 
         async function loadUserProfile() {
-            // FIXED: Using exactly 4 segments for a valid document reference in Firestore
             const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid);
             
             return new Promise((resolve) => {
@@ -275,7 +300,6 @@
             saveNameBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
             
             try {
-                // FIXED: Match the 4-segment path used for loading
                 const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid);
                 await setDoc(profileRef, { name: name }, { merge: true });
                 hideNameModal();
