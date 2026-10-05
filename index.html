@@ -72,14 +72,14 @@
                 <div class="bg-blue-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-blue-100">
                     <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider mb-1">Today</span>
                     <div class="flex items-baseline gap-1">
-                        <span id="statToday" class="text-3xl font-black text-blue-700">0.0</span>
+                        <span id="statToday" class="text-3xl font-black text-blue-700" style="font-variant-numeric: tabular-nums;">0.00</span>
                         <span class="text-sm font-medium text-blue-600">hrs</span>
                     </div>
                 </div>
                 <div class="bg-indigo-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-indigo-100">
                     <span class="text-xs font-semibold text-indigo-500 uppercase tracking-wider mb-1">Cycle Total</span>
                     <div class="flex items-baseline gap-1">
-                        <span id="statCycle" class="text-3xl font-black text-indigo-700">0.0</span>
+                        <span id="statCycle" class="text-3xl font-black text-indigo-700" style="font-variant-numeric: tabular-nums;">0.00</span>
                         <span class="text-sm font-medium text-indigo-600">hrs</span>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
                         </span>
                         <div class="flex items-baseline gap-1">
                             <span class="text-2xl font-black text-emerald-700">₱</span>
-                            <span id="statCost" class="text-3xl font-black text-emerald-700">0.00</span>
+                            <span id="statCost" class="text-3xl font-black text-emerald-700" style="font-variant-numeric: tabular-nums;">0.0000</span>
                         </div>
                     </div>
                     <button id="openResetModalBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2">
@@ -193,12 +193,12 @@
         // Replace the "YOUR_API_KEY" strings with the ones you get from Firebase
         // =========================================================================
         const myCustomFirebaseConfig = {
-            apiKey: "AIzaSyD1_ua2sTTb1ZELPaW2SI0tnu8mGOK6bDs",
-            authDomain: "dorm-ac-tracker.firebaseapp.com",
-            projectId: "dorm-ac-tracker",
-            storageBucket: "dorm-ac-tracker.firebasestorage.app",
-            messagingSenderId: "746576139956",
-            appId: "1:746576139956:web:658be45c5a5dc9045669e1"
+          apiKey: "AIzaSyD1_ua2sTTb1ZELPaW2SI0tnu8mGOK6bDs",
+          authDomain: "dorm-ac-tracker.firebaseapp.com",
+          projectId: "dorm-ac-tracker",
+          storageBucket: "dorm-ac-tracker.firebasestorage.app",
+          messagingSenderId: "746576139956",
+          appId: "1:746576139956:web:658be45c5a5dc9045669e1"
         };
         // =========================================================================
 
@@ -395,7 +395,8 @@
             onSnapshot(historyRef, (snapshot) => {
                 const rawHistory = [];
                 snapshot.forEach(d => rawHistory.push({ id: d.id, ...d.data() }));
-                billingHistory = rawHistory.sort((a, b) => b.endDate - a.endDate); // newest first
+                // Safety fallback for sorting in case of malformed data
+                billingHistory = rawHistory.sort((a, b) => (b.endDate || 0) - (a.endDate || 0)); 
                 updateHistoryUI();
             }, (error) => console.error("History sync error", error));
 
@@ -445,7 +446,7 @@
             if (isAcOn) {
                 liveTickerInterval = setInterval(() => {
                     updateStatsUI();
-                }, 60000); // update stats every minute
+                }, 1000); // update stats every second for a real-time effect
             }
         }
 
@@ -520,7 +521,7 @@
             statToday.textContent = stats.today;
             statCycle.textContent = stats.cycle;
             statCost.textContent = stats.cost;
-            resetConfirmCost.textContent = `₱${stats.cost}`; // Update modal preview
+            resetConfirmCost.textContent = `₱${stats.rawCost.toFixed(2)}`; // Keep modal formatted to 2 decimals
         }
 
         function calculateUsageStats(events) {
@@ -556,9 +557,9 @@
             const cost = cycleHrs * AC_POWER_KW * MERALCO_RATE_PHP;
 
             return {
-                today: (todayUsage / (1000 * 60 * 60)).toFixed(1),
-                cycle: cycleHrs.toFixed(1),
-                cost: cost.toFixed(2),
+                today: (todayUsage / (1000 * 60 * 60)).toFixed(2),
+                cycle: cycleHrs.toFixed(2),
+                cost: cost.toFixed(4), // 4 decimal places for a live "gas pump" effect
                 rawCycleHrs: cycleHrs,
                 rawCost: cost
             };
@@ -615,20 +616,26 @@
 
             let html = '';
             billingHistory.forEach(cycle => {
-                const startStr = new Date(cycle.startDate).toLocaleDateString([], { month: 'short', day: 'numeric' });
-                const endStr = new Date(cycle.endDate).toLocaleDateString([], { month: 'short', day: 'numeric' });
-                const cost = parseFloat(cycle.totalCost).toFixed(2);
-                const hrs = parseFloat(cycle.totalHours).toFixed(1);
+                const sDate = new Date(cycle.startDate);
+                const eDate = new Date(cycle.endDate);
+                
+                const formatOpts = { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+                const startStr = sDate.toLocaleDateString('en-US', formatOpts);
+                const endStr = eDate.toLocaleDateString('en-US', formatOpts);
+                
+                const cost = parseFloat(cycle.totalCost || 0).toFixed(2);
+                const hrs = parseFloat(cycle.totalHours || 0).toFixed(1);
+                const logger = escapeHtml(cycle.loggedBy || 'Unknown User');
 
                 html += `
-                    <div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                    <div class="flex justify-between items-center bg-white p-3.5 rounded-xl shadow-sm border border-slate-100">
                         <div class="flex flex-col">
-                            <span class="text-sm font-bold text-slate-800">${startStr} - ${endStr}</span>
-                            <span class="text-xs text-slate-500">Logged by ${escapeHtml(cycle.loggedBy)}</span>
+                            <span class="text-[13px] font-bold text-slate-700 leading-tight">${startStr} <br><span class="text-slate-400 font-medium text-[11px] uppercase">to</span> ${endStr}</span>
+                            <span class="text-[11px] text-slate-500 mt-1.5 font-medium"><i class="fa-solid fa-user-pen mr-1 text-slate-400"></i> ${logger}</span>
                         </div>
-                        <div class="text-right">
-                            <div class="font-black text-emerald-600">₱${cost}</div>
-                            <div class="text-xs font-medium text-slate-400">${hrs} hrs</div>
+                        <div class="text-right flex flex-col items-end">
+                            <div class="font-black text-emerald-600 text-lg leading-none">₱${cost}</div>
+                            <div class="text-[11px] font-medium text-slate-400 mt-1 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">${hrs} hrs</div>
                         </div>
                     </div>
                 `;
@@ -638,6 +645,7 @@
 
         // Reset Modal Logic
         openResetModalBtn.addEventListener('click', () => {
+            updateStatsUI(); // Ensure preview is recalculated to the exact second before opening
             resetModal.classList.remove('opacity-0', 'pointer-events-none');
             setTimeout(() => resetModalContent.classList.remove('scale-95'), 10);
         });
@@ -674,7 +682,7 @@
                 if (stats.rawCycleHrs > 0.01) {
                     const historyRef = collection(db, 'artifacts', appId, 'public', 'data', 'billing_history');
                     await addDoc(historyRef, {
-                        startDate: lastResetTimestamp || allEvents[0]?.timestamp || now,
+                        startDate: lastResetTimestamp || (allEvents.length > 0 ? allEvents[0].timestamp : now),
                         endDate: now,
                         totalHours: stats.rawCycleHrs,
                         totalCost: stats.rawCost,
