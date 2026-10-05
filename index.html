@@ -2,8 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dorm AC Tracker</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="apple-touch-icon" href="https://placehold.co/180x180/4f46e5/ffffff?text=AC">
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Dorm AC Tracker","short_name":"AC Tracker","display":"standalone","background_color":"#f3f4f6","theme_color":"#4f46e5","icons":[{"src":"https://placehold.co/192x192/4f46e5/ffffff?text=AC","sizes":"192x192","type":"image/png"},{"src":"https://placehold.co/512x512/4f46e5/ffffff?text=AC","sizes":"512x512","type":"image/png"}]}'>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -50,10 +58,15 @@
                 <i class="fa-solid fa-snowflake text-xl drop-shadow-md"></i>
                 <h1 class="font-bold text-lg tracking-wide drop-shadow-sm">Dorm AC</h1>
             </div>
-            <button id="editNameBtn" class="text-sm bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full transition-colors flex items-center gap-2 shadow-sm">
-                <i class="fa-solid fa-user-pen"></i>
-                <span id="headerUserName" class="max-w-[100px] truncate">Setup Profile</span>
-            </button>
+            <div class="flex items-center gap-2">
+                <button id="openSettingsBtn" class="text-sm bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 w-8 h-8 rounded-full transition-colors flex items-center justify-center shadow-sm">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+                <button id="editNameBtn" class="text-sm bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full transition-colors flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <span id="headerUserName" class="max-w-[100px] truncate">Setup Profile</span>
+                </button>
+            </div>
         </header>
 
         <!-- Main Content -->
@@ -98,7 +111,7 @@
                     <div class="absolute top-0 right-1/4 w-32 h-32 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none"></div>
                     <div class="flex flex-col relative z-10">
                         <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1 flex items-center gap-1">
-                            <i id="costBoltIcon" class="fa-solid fa-bolt transition-colors duration-300"></i> Est. Cost (₱15.39/kWh)
+                            <i id="costBoltIcon" class="fa-solid fa-bolt transition-colors duration-300"></i> Est. Cost (<span id="costRateLabel">₱15.39/kWh</span>)
                         </span>
                         <div class="flex items-baseline gap-1">
                             <span class="text-2xl font-black text-emerald-700 drop-shadow-sm">₱</span>
@@ -191,6 +204,54 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white/20 relative overflow-hidden" id="settingsModalContent">
+            <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-transparent pointer-events-none"></div>
+            
+            <div class="flex justify-between items-start mb-6 relative z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center shadow-inner">
+                        <i class="fa-solid fa-sliders text-xl text-indigo-600 drop-shadow-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 leading-tight">App Settings</h2>
+                        <p class="text-xs text-slate-500">Syncs for all roommates</p>
+                    </div>
+                </div>
+                <button id="closeSettingsBtn" class="text-slate-400 hover:text-slate-600 p-2 transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4 relative z-10 mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Meralco Rate (₱/kWh)</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-slate-500 font-bold">₱</span>
+                        </div>
+                        <input type="number" id="rateInput" step="0.01" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium shadow-sm inset-shadow-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">AC Wattage (Watts)</label>
+                    <div class="relative">
+                        <input type="number" id="wattageInput" step="10" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium shadow-sm inset-shadow-sm">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-slate-400 text-sm font-medium">W</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1.5">A standard 1HP non-inverter is ~1000W.</p>
+                </div>
+            </div>
+            
+            <button id="saveSettingsBtn" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-[0_4px_15px_rgba(79,70,229,0.3)] border border-indigo-500/30 relative z-10">
+                Save Changes
+            </button>
+        </div>
+    </div>
+
     <!-- Error Toast -->
     <div id="errorToast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg z-[70] font-medium text-sm flex items-center gap-2 transition-all duration-300 opacity-0 -translate-y-full pointer-events-none">
         <i class="fa-solid fa-circle-exclamation"></i>
@@ -231,11 +292,13 @@
         // Use requestAnimationFrame instead of setInterval for 60fps smoothness
         let liveTickerFrame = null; 
         
-        // Billing calculation constants
-        let lastResetTimestamp = 0;
+        // App Settings Configuration
+        let appConfig = {
+            meralcoRatePhp: 15.39,
+            acPowerKw: 1.0,
+            lastResetTimestamp: 0
+        };
         let billingHistory = [];
-        const AC_POWER_KW = 1.0; 
-        const MERALCO_RATE_PHP = 15.39; 
 
         // UI Elements
         const loadingOverlay = document.getElementById('loadingOverlay');
@@ -245,6 +308,14 @@
         const saveNameBtn = document.getElementById('saveNameBtn');
         const editNameBtn = document.getElementById('editNameBtn');
         const headerUserName = document.getElementById('headerUserName');
+        
+        const openSettingsBtn = document.getElementById('openSettingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const settingsModalContent = document.getElementById('settingsModalContent');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const rateInput = document.getElementById('rateInput');
+        const wattageInput = document.getElementById('wattageInput');
         
         const acToggleButton = document.getElementById('acToggleButton');
         const acIcon = document.getElementById('acIcon');
@@ -257,6 +328,7 @@
         
         const statCycle = document.getElementById('statCycle');
         const statCost = document.getElementById('statCost');
+        const costRateLabel = document.getElementById('costRateLabel');
         const costBoltIcon = document.getElementById('costBoltIcon');
         const billingHistoryFeed = document.getElementById('billingHistoryFeed');
         const openResetModalBtn = document.getElementById('openResetModalBtn');
@@ -402,7 +474,14 @@
 
             onSnapshot(configRef, (docSnap) => {
                 if (docSnap.exists()) {
-                    lastResetTimestamp = sanitizeNumber(docSnap.data().lastResetTimestamp);
+                    const data = docSnap.data();
+                    appConfig.lastResetTimestamp = sanitizeNumber(data.lastResetTimestamp);
+                    
+                    if (data.meralcoRatePhp) appConfig.meralcoRatePhp = parseFloat(data.meralcoRatePhp);
+                    if (data.acPowerKw) appConfig.acPowerKw = parseFloat(data.acPowerKw);
+                    
+                    // Update UI labels
+                    costRateLabel.textContent = `₱${appConfig.meralcoRatePhp.toFixed(2)}/kWh`;
                 }
                 updateAppState();
             }, (error) => console.error("Config sync error", error));
@@ -568,7 +647,7 @@
             
             const startOfToday = new Date();
             startOfToday.setHours(0, 0, 0, 0);
-            const todayMs = Math.max(startOfToday.getTime(), lastResetTimestamp);
+            const todayMs = Math.max(startOfToday.getTime(), appConfig.lastResetTimestamp);
 
             let todayUsage = 0;
             let cycleUsage = 0;
@@ -579,18 +658,18 @@
                     activeStart = evt.timestamp;
                 } else if (evt.type === 'OFF' && activeStart) {
                     todayUsage += getOverlap(activeStart, evt.timestamp, todayMs, now);
-                    cycleUsage += getOverlap(activeStart, evt.timestamp, lastResetTimestamp, now);
+                    cycleUsage += getOverlap(activeStart, evt.timestamp, appConfig.lastResetTimestamp, now);
                     activeStart = null;
                 }
             });
 
             if (activeStart) {
                 todayUsage += getOverlap(activeStart, now, todayMs, now);
-                cycleUsage += getOverlap(activeStart, now, lastResetTimestamp, now);
+                cycleUsage += getOverlap(activeStart, now, appConfig.lastResetTimestamp, now);
             }
 
             const cycleHrs = cycleUsage / (1000 * 60 * 60);
-            const cost = cycleHrs * AC_POWER_KW * MERALCO_RATE_PHP;
+            const cost = cycleHrs * appConfig.acPowerKw * appConfig.meralcoRatePhp;
 
             return {
                 today: (todayUsage / (1000 * 60 * 60)).toFixed(2),
@@ -691,6 +770,51 @@
 
         cancelResetBtn.addEventListener('click', closeResetModal);
 
+        openSettingsBtn.addEventListener('click', () => {
+            rateInput.value = appConfig.meralcoRatePhp;
+            wattageInput.value = Math.round(appConfig.acPowerKw * 1000); // Convert kW back to Watts
+            
+            settingsModal.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => settingsModalContent.classList.remove('scale-95'), 10);
+        });
+
+        function closeSettingsModal() {
+            settingsModalContent.classList.add('scale-95');
+            setTimeout(() => settingsModal.classList.add('opacity-0', 'pointer-events-none'), 300);
+        }
+
+        closeSettingsBtn.addEventListener('click', closeSettingsModal);
+
+        saveSettingsBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+            
+            const newRate = parseFloat(rateInput.value);
+            const newWattage = parseFloat(wattageInput.value);
+            
+            if (isNaN(newRate) || isNaN(newWattage) || newRate <= 0 || newWattage <= 0) {
+                return showError("Please enter valid positive numbers.");
+            }
+
+            saveSettingsBtn.disabled = true;
+            saveSettingsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            
+            try {
+                const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config', 'main');
+                await setDoc(configRef, { 
+                    meralcoRatePhp: newRate,
+                    acPowerKw: newWattage / 1000 // Convert Watts to kW
+                }, { merge: true });
+                
+                closeSettingsModal();
+            } catch (error) {
+                console.error("Error saving settings:", error);
+                showError("Failed to update settings.");
+            } finally {
+                saveSettingsBtn.disabled = false;
+                saveSettingsBtn.innerHTML = 'Save Changes';
+            }
+        });
+
         toggleActivityLogBtn.addEventListener('click', () => {
             isActivityLogOpen = !isActivityLogOpen;
             if (isActivityLogOpen) {
@@ -715,7 +839,7 @@
                 if (stats.rawCycleHrs > 0.01) {
                     const historyRef = collection(db, 'artifacts', appId, 'public', 'data', 'billing_history');
                     await addDoc(historyRef, {
-                        startDate: lastResetTimestamp || (allEvents.length > 0 ? allEvents[0].timestamp : now),
+                        startDate: appConfig.lastResetTimestamp || (allEvents.length > 0 ? allEvents[0].timestamp : now),
                         endDate: now,
                         totalHours: stats.rawCycleHrs,
                         totalCost: stats.rawCost,
