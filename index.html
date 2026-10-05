@@ -193,12 +193,12 @@
         // Replace the "YOUR_API_KEY" strings with the ones you get from Firebase
         // =========================================================================
         const myCustomFirebaseConfig = {
-          apiKey: "AIzaSyD1_ua2sTTb1ZELPaW2SI0tnu8mGOK6bDs",
-          authDomain: "dorm-ac-tracker.firebaseapp.com",
-          projectId: "dorm-ac-tracker",
-          storageBucket: "dorm-ac-tracker.firebasestorage.app",
-          messagingSenderId: "746576139956",
-          appId: "1:746576139956:web:658be45c5a5dc9045669e1"
+            apiKey: "AIzaSyD1_ua2sTTb1ZELPaW2SI0tnu8mGOK6bDs",
+            authDomain: "dorm-ac-tracker.firebaseapp.com",
+            projectId: "dorm-ac-tracker",
+            storageBucket: "dorm-ac-tracker.firebasestorage.app",
+            messagingSenderId: "746576139956",
+            appId: "1:746576139956:web:658be45c5a5dc9045669e1"
         };
         // =========================================================================
 
@@ -378,6 +378,15 @@
 
         editNameBtn.addEventListener('click', showNameModal);
 
+        // Helper to prevent crashes if database entries are typed incorrectly in the console
+        function sanitizeNumber(val) {
+            if (!val) return 0;
+            if (typeof val === 'number') return val;
+            if (val.toMillis) return val.toMillis(); // In case 'Timestamp' type was used instead of 'Number'
+            if (val.seconds) return val.seconds * 1000;
+            return Number(val) || 0;
+        }
+
         function startRealtimeSync() {
             const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'ac_events');
             const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config', 'main');
@@ -386,7 +395,7 @@
             // Listen to Config (for reset timestamp)
             onSnapshot(configRef, (docSnap) => {
                 if (docSnap.exists()) {
-                    lastResetTimestamp = docSnap.data().lastResetTimestamp || 0;
+                    lastResetTimestamp = sanitizeNumber(docSnap.data().lastResetTimestamp);
                 }
                 updateAppState();
             }, (error) => console.error("Config sync error", error));
@@ -394,9 +403,20 @@
             // Listen to Billing History
             onSnapshot(historyRef, (snapshot) => {
                 const rawHistory = [];
-                snapshot.forEach(d => rawHistory.push({ id: d.id, ...d.data() }));
-                // Safety fallback for sorting in case of malformed data
-                billingHistory = rawHistory.sort((a, b) => (b.endDate || 0) - (a.endDate || 0)); 
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    rawHistory.push({ 
+                        id: doc.id, 
+                        ...data,
+                        // Force numbers to prevent sorting/math crashes
+                        startDate: sanitizeNumber(data.startDate),
+                        endDate: sanitizeNumber(data.endDate),
+                        totalCost: sanitizeNumber(data.totalCost),
+                        totalHours: sanitizeNumber(data.totalHours)
+                    });
+                });
+                
+                billingHistory = rawHistory.sort((a, b) => b.endDate - a.endDate); 
                 updateHistoryUI();
             }, (error) => console.error("History sync error", error));
 
@@ -404,7 +424,12 @@
             onSnapshot(eventsRef, (snapshot) => {
                 const rawEvents = [];
                 snapshot.forEach(doc => {
-                    rawEvents.push({ id: doc.id, ...doc.data() });
+                    const data = doc.data();
+                    rawEvents.push({ 
+                        id: doc.id, 
+                        ...data,
+                        timestamp: sanitizeNumber(data.timestamp)
+                    });
                 });
                 
                 // Sort chronologically
