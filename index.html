@@ -16,18 +16,18 @@
         }
         
         .ac-btn-on {
-            box-shadow: 0 0 40px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2);
-            animation: pulse-green 2s infinite;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2);
+            animation: pulse-blue 2s infinite;
         }
         
         .ac-btn-off {
             box-shadow: 0 0 40px rgba(107, 114, 128, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.05);
         }
 
-        @keyframes pulse-green {
-            0% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2); }
-            50% { box-shadow: 0 0 50px rgba(16, 185, 129, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.3); }
-            100% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2); }
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2); }
+            50% { box-shadow: 0 0 50px rgba(59, 130, 246, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2); }
         }
     </style>
 </head>
@@ -54,8 +54,13 @@
             <!-- AC Status Control -->
             <div class="flex flex-col items-center justify-center pt-2">
                 <button id="acToggleButton" disabled class="relative w-48 h-48 rounded-full flex flex-col items-center justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none bg-slate-100 border-4 border-slate-200 ac-btn-off">
-                    <i id="acIcon" class="fa-solid fa-power-off text-5xl mb-2 text-slate-400 transition-colors duration-300"></i>
-                    <span id="acStatusText" class="font-bold text-xl text-slate-500 tracking-wider transition-colors duration-300">OFF</span>
+                    <!-- Spinning Blue Light Ring -->
+                    <div id="acSpinRing" class="absolute inset-[-8px] rounded-full border-[3px] border-transparent border-t-blue-400 border-l-blue-300 opacity-0 transition-opacity duration-1000 animate-[spin_3s_linear_infinite]" style="box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);"></div>
+                    
+                    <div id="acIconWrapper" class="transition-all duration-300 transform mb-2 flex items-center justify-center h-[50px] relative z-10">
+                        <i id="acIcon" class="fa-solid fa-power-off text-5xl text-slate-400 transition-colors duration-300"></i>
+                    </div>
+                    <span id="acStatusText" class="font-bold text-xl text-slate-500 tracking-wider transition-colors duration-300 relative z-10">OFF</span>
                 </button>
                 <div id="acLastAction" class="mt-6 text-sm text-slate-500 text-center min-h-[40px] opacity-0 transition-opacity duration-300">
                     Loading status...
@@ -95,19 +100,6 @@
                 </div>
             </div>
 
-            <!-- Activity Log -->
-            <div class="flex flex-col">
-                <div class="flex justify-between items-end mb-3 px-1">
-                    <h2 class="font-bold text-slate-700">Activity Log</h2>
-                    <span class="text-xs font-medium text-slate-400" id="logCount">0 events</span>
-                </div>
-                <!-- Removed overflow restrictions so this container grows naturally -->
-                <div id="activityFeed" class="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-3">
-                    <!-- Feed items will be injected here -->
-                    <div class="text-center text-sm text-slate-400 py-4 italic">Loading history...</div>
-                </div>
-            </div>
-
             <!-- Billing History -->
             <div class="flex flex-col">
                 <div class="flex justify-between items-end mb-3 px-1">
@@ -115,6 +107,24 @@
                 </div>
                 <div id="billingHistoryFeed" class="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-3">
                     <div class="text-center text-sm text-slate-400 py-4 italic">No past cycles logged yet.</div>
+                </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="flex flex-col">
+                <button id="toggleActivityLogBtn" class="flex justify-between items-center mb-3 px-1 w-full focus:outline-none transition-opacity hover:opacity-70 text-left">
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-bold text-slate-700">Activity Log</h2>
+                        <i id="activityLogChevron" class="fa-solid fa-chevron-up text-xs text-slate-400 transition-transform duration-300"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-400" id="logCount">0 events</span>
+                </button>
+                <!-- Wrapper for collapsing -->
+                <div id="activityLogWrapper">
+                    <div id="activityFeed" class="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-3">
+                        <!-- Feed items will be injected here -->
+                        <div class="text-center text-sm text-slate-400 py-4 italic">Loading history...</div>
+                    </div>
                 </div>
             </div>
 
@@ -241,6 +251,11 @@
         const cancelResetBtn = document.getElementById('cancelResetBtn');
         const confirmResetBtn = document.getElementById('confirmResetBtn');
         const resetConfirmCost = document.getElementById('resetConfirmCost');
+
+        const toggleActivityLogBtn = document.getElementById('toggleActivityLogBtn');
+        const activityLogWrapper = document.getElementById('activityLogWrapper');
+        const activityLogChevron = document.getElementById('activityLogChevron');
+        let isActivityLogOpen = true; // Open by default
 
         const errorToast = document.getElementById('errorToast');
         const errorMsg = document.getElementById('errorMsg');
@@ -438,17 +453,31 @@
             acToggleButton.disabled = false;
             acLastAction.classList.remove('opacity-0');
 
+            const isVisualOn = acIcon.classList.contains('fa-fan');
+            const acIconWrapper = document.getElementById('acIconWrapper');
+
             if (isAcOn) {
                 // Style for ON
                 acToggleButton.classList.remove('bg-slate-100', 'border-slate-200', 'ac-btn-off');
-                acToggleButton.classList.add('bg-green-500', 'border-green-400', 'ac-btn-on');
-                
-                acIcon.classList.remove('text-slate-400');
-                acIcon.classList.add('text-white');
+                acToggleButton.classList.add('bg-blue-500', 'border-blue-400', 'ac-btn-on');
                 
                 acStatusText.textContent = 'ON';
                 acStatusText.classList.remove('text-slate-500');
                 acStatusText.classList.add('text-white');
+
+                // Show Spin Ring
+                document.getElementById('acSpinRing').classList.remove('opacity-0');
+                document.getElementById('acSpinRing').classList.add('opacity-100');
+
+                // Morph Icon
+                if (!isVisualOn) {
+                    acIconWrapper.classList.add('scale-0', 'rotate-180', 'opacity-0');
+                    setTimeout(() => {
+                        acIcon.classList.remove('fa-power-off', 'text-slate-400');
+                        acIcon.classList.add('fa-fan', 'text-white', 'animate-[spin_2s_linear_infinite]');
+                        acIconWrapper.classList.remove('scale-0', 'rotate-180', 'opacity-0');
+                    }, 300);
+                }
 
                 if (currentOnEvent) {
                     const timeString = formatRelativeTime(currentOnEvent.timestamp);
@@ -456,15 +485,26 @@
                 }
             } else {
                 // Style for OFF
-                acToggleButton.classList.remove('bg-green-500', 'border-green-400', 'ac-btn-on');
+                acToggleButton.classList.remove('bg-blue-500', 'border-blue-400', 'bg-green-500', 'border-green-400', 'ac-btn-on');
                 acToggleButton.classList.add('bg-slate-100', 'border-slate-200', 'ac-btn-off');
-                
-                acIcon.classList.remove('text-white');
-                acIcon.classList.add('text-slate-400');
                 
                 acStatusText.textContent = 'OFF';
                 acStatusText.classList.remove('text-white');
                 acStatusText.classList.add('text-slate-500');
+
+                // Hide Spin Ring
+                document.getElementById('acSpinRing').classList.remove('opacity-100');
+                document.getElementById('acSpinRing').classList.add('opacity-0');
+
+                // Morph Icon
+                if (isVisualOn) {
+                    acIconWrapper.classList.add('scale-0', '-rotate-180', 'opacity-0');
+                    setTimeout(() => {
+                        acIcon.classList.remove('fa-fan', 'text-white', 'animate-[spin_2s_linear_infinite]');
+                        acIcon.classList.add('fa-power-off', 'text-slate-400');
+                        acIconWrapper.classList.remove('scale-0', '-rotate-180', 'opacity-0');
+                    }, 300);
+                }
 
                 if (lastEvent && lastEvent.type === 'OFF') {
                     const timeString = formatRelativeTime(lastEvent.timestamp);
@@ -544,8 +584,8 @@
             let html = '';
             reversedEvents.forEach(evt => {
                 const isON = evt.type === 'ON';
-                const iconBg = isON ? 'bg-green-100 text-green-600' : 'bg-slate-200 text-slate-500';
-                const iconClass = isON ? 'fa-play' : 'fa-stop';
+                const iconBg = isON ? 'bg-blue-100 text-blue-600' : 'bg-slate-200 text-slate-500';
+                const iconClass = isON ? 'fa-fan' : 'fa-power-off';
                 const actionText = isON ? 'Turned ON' : 'Turned OFF';
                 const timeText = formatRelativeTime(evt.timestamp);
 
@@ -608,6 +648,17 @@
         }
 
         cancelResetBtn.addEventListener('click', closeResetModal);
+
+        toggleActivityLogBtn.addEventListener('click', () => {
+            isActivityLogOpen = !isActivityLogOpen;
+            if (isActivityLogOpen) {
+                activityLogWrapper.classList.remove('hidden');
+                activityLogChevron.classList.remove('rotate-180');
+            } else {
+                activityLogWrapper.classList.add('hidden');
+                activityLogChevron.classList.add('rotate-180');
+            }
+        });
 
         confirmResetBtn.addEventListener('click', async () => {
             if (!currentUser) return;
