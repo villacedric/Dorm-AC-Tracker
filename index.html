@@ -29,6 +29,12 @@
             50% { box-shadow: 0 0 50px rgba(59, 130, 246, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.3); }
             100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2); }
         }
+        
+        /* Ensures the numbers don't wiggle horizontally as they change */
+        .fluid-numbers {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.02em;
+        }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen bg-gray-100 flex flex-col">
@@ -72,26 +78,26 @@
                 <div class="bg-blue-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-blue-100">
                     <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider mb-1">Today</span>
                     <div class="flex items-baseline gap-1">
-                        <span id="statToday" class="text-3xl font-black text-blue-700" style="font-variant-numeric: tabular-nums;">0.00</span>
+                        <span id="statToday" class="text-3xl font-black text-blue-700 fluid-numbers">0.00</span>
                         <span class="text-sm font-medium text-blue-600">hrs</span>
                     </div>
                 </div>
                 <div class="bg-indigo-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-indigo-100">
                     <span class="text-xs font-semibold text-indigo-500 uppercase tracking-wider mb-1">Cycle Total</span>
                     <div class="flex items-baseline gap-1">
-                        <span id="statCycle" class="text-3xl font-black text-indigo-700" style="font-variant-numeric: tabular-nums;">0.00</span>
+                        <span id="statCycle" class="text-3xl font-black text-indigo-700 fluid-numbers">0.00</span>
                         <span class="text-sm font-medium text-indigo-600">hrs</span>
                     </div>
                 </div>
                 <!-- Cost Estimate Row -->
-                <div class="col-span-2 bg-emerald-50 rounded-2xl p-4 flex justify-between items-center border border-emerald-100 shadow-sm">
+                <div class="col-span-2 bg-emerald-50 rounded-2xl p-4 flex justify-between items-center border border-emerald-100 shadow-sm transition-all duration-300" id="costContainer">
                     <div class="flex flex-col">
                         <span class="text-xs font-semibold text-emerald-600 uppercase tracking-wider mb-1 flex items-center gap-1">
-                            <i class="fa-solid fa-bolt"></i> Est. Cost (₱15.39/kWh)
+                            <i id="costBoltIcon" class="fa-solid fa-bolt transition-colors duration-300"></i> Est. Cost (₱15.39/kWh)
                         </span>
                         <div class="flex items-baseline gap-1">
                             <span class="text-2xl font-black text-emerald-700">₱</span>
-                            <span id="statCost" class="text-3xl font-black text-emerald-700" style="font-variant-numeric: tabular-nums;">0.0000</span>
+                            <span id="statCost" class="text-3xl font-black text-emerald-700 fluid-numbers transition-colors duration-300">0.0000</span>
                         </div>
                     </div>
                     <button id="openResetModalBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2">
@@ -127,6 +133,11 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Temporary Admin Button -->
+            <button id="admin100HrBtn" class="mt-8 bg-slate-800 text-white text-xs py-2 px-4 rounded-xl opacity-40 hover:opacity-100 transition-opacity mx-auto flex items-center gap-2">
+                <i class="fa-solid fa-wrench"></i> Start Fresh with 100 Hours
+            </button>
 
         </main>
     </div>
@@ -202,8 +213,6 @@
         };
         // =========================================================================
 
-        // (This line ensures it still works in this chat window while you test it, 
-        // but uses your custom config when you upload it to GitHub)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : myCustomFirebaseConfig;
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'dorm-ac-tracker-app';
@@ -215,13 +224,15 @@
         let allEvents = [];
         let isAcOn = false;
         let isProcessingAction = false;
-        let liveTickerInterval = null;
+        
+        // Use requestAnimationFrame instead of setInterval for 60fps smoothness
+        let liveTickerFrame = null; 
         
         // Billing calculation constants
         let lastResetTimestamp = 0;
         let billingHistory = [];
-        const AC_POWER_KW = 1.0; // 1HP non-inverter is roughly 1kW
-        const MERALCO_RATE_PHP = 15.39; // Estimated rate per kWh in PHP
+        const AC_POWER_KW = 1.0; 
+        const MERALCO_RATE_PHP = 15.39; 
 
         // UI Elements
         const loadingOverlay = document.getElementById('loadingOverlay');
@@ -241,9 +252,9 @@
         const activityFeed = document.getElementById('activityFeed');
         const logCount = document.getElementById('logCount');
         
-        // New UI Elements
         const statCycle = document.getElementById('statCycle');
         const statCost = document.getElementById('statCost');
+        const costBoltIcon = document.getElementById('costBoltIcon');
         const billingHistoryFeed = document.getElementById('billingHistoryFeed');
         const openResetModalBtn = document.getElementById('openResetModalBtn');
         const resetModal = document.getElementById('resetModal');
@@ -255,7 +266,7 @@
         const toggleActivityLogBtn = document.getElementById('toggleActivityLogBtn');
         const activityLogWrapper = document.getElementById('activityLogWrapper');
         const activityLogChevron = document.getElementById('activityLogChevron');
-        let isActivityLogOpen = true; // Open by default
+        let isActivityLogOpen = true; 
 
         const errorToast = document.getElementById('errorToast');
         const errorMsg = document.getElementById('errorMsg');
@@ -278,7 +289,6 @@
 
         async function initialize() {
             try {
-                // If user is running this on GitHub but hasn't put in their keys yet
                 if (firebaseConfig.apiKey === "YOUR_API_KEY_HERE") {
                     document.querySelector('.fa-circle-notch').classList.remove('fa-spin');
                     document.querySelector('.fa-circle-notch').classList.replace('fa-circle-notch', 'fa-triangle-exclamation');
@@ -290,7 +300,6 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Authenticate
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
@@ -308,8 +317,6 @@
             } catch (error) {
                 console.error("Initialization error:", error);
                 showError("Failed to connect. Check your Firebase config.");
-                
-                // Show a more helpful loading screen error
                 document.querySelector('.fa-circle-notch').classList.remove('fa-spin');
                 document.querySelector('.fa-circle-notch').classList.replace('fa-circle-notch', 'fa-triangle-exclamation');
                 document.querySelector('#loadingOverlay p').innerHTML = "<b>Connection Failed.</b><br>Check console for errors.";
@@ -325,7 +332,6 @@
                         userProfile.name = docSnap.data().name;
                         headerUserName.textContent = userProfile.name;
                     } else {
-                        // Prompt for name if not set
                         showNameModal();
                         headerUserName.textContent = `User ${currentUser.uid.substring(0,4)}`;
                         userProfile.name = `User ${currentUser.uid.substring(0,4)}`;
@@ -333,7 +339,7 @@
                     resolve();
                 }, (error) => {
                     console.error("Profile sync error:", error);
-                    resolve(); // Resolve anyway to proceed with default name
+                    resolve(); 
                 });
             });
         }
@@ -378,11 +384,10 @@
 
         editNameBtn.addEventListener('click', showNameModal);
 
-        // Helper to prevent crashes if database entries are typed incorrectly in the console
         function sanitizeNumber(val) {
             if (!val) return 0;
             if (typeof val === 'number') return val;
-            if (val.toMillis) return val.toMillis(); // In case 'Timestamp' type was used instead of 'Number'
+            if (val.toMillis) return val.toMillis(); 
             if (val.seconds) return val.seconds * 1000;
             return Number(val) || 0;
         }
@@ -392,7 +397,6 @@
             const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config', 'main');
             const historyRef = collection(db, 'artifacts', appId, 'public', 'data', 'billing_history');
 
-            // Listen to Config (for reset timestamp)
             onSnapshot(configRef, (docSnap) => {
                 if (docSnap.exists()) {
                     lastResetTimestamp = sanitizeNumber(docSnap.data().lastResetTimestamp);
@@ -400,7 +404,6 @@
                 updateAppState();
             }, (error) => console.error("Config sync error", error));
 
-            // Listen to Billing History
             onSnapshot(historyRef, (snapshot) => {
                 const rawHistory = [];
                 snapshot.forEach(doc => {
@@ -408,7 +411,6 @@
                     rawHistory.push({ 
                         id: doc.id, 
                         ...data,
-                        // Force numbers to prevent sorting/math crashes
                         startDate: sanitizeNumber(data.startDate),
                         endDate: sanitizeNumber(data.endDate),
                         totalCost: sanitizeNumber(data.totalCost),
@@ -420,7 +422,6 @@
                 updateHistoryUI();
             }, (error) => console.error("History sync error", error));
 
-            // Listen to AC Events
             onSnapshot(eventsRef, (snapshot) => {
                 const rawEvents = [];
                 snapshot.forEach(doc => {
@@ -432,7 +433,6 @@
                     });
                 });
                 
-                // Sort chronologically
                 allEvents = rawEvents.sort((a, b) => a.timestamp - b.timestamp);
                 
                 updateAppState();
@@ -445,11 +445,9 @@
         }
 
         function updateAppState() {
-            // Determine current status
             let currentOnEvent = null;
             let lastEvent = null;
 
-            // Process chronological events to find if currently on
             allEvents.forEach(evt => {
                 lastEvent = evt;
                 if (evt.type === 'ON') {
@@ -461,17 +459,18 @@
 
             isAcOn = currentOnEvent !== null;
 
-            // Update UI components
             updateMainButton(lastEvent, currentOnEvent);
             updateStatsUI();
             updateActivityFeed();
 
-            // Set up ticker to update live stats if AC is ON
-            if (liveTickerInterval) clearInterval(liveTickerInterval);
+            // 60FPS fluid animation engine using requestAnimationFrame
+            if (liveTickerFrame) cancelAnimationFrame(liveTickerFrame);
             if (isAcOn) {
-                liveTickerInterval = setInterval(() => {
+                const liveTick = () => {
                     updateStatsUI();
-                }, 1000); // update stats every second for a real-time effect
+                    liveTickerFrame = requestAnimationFrame(liveTick);
+                };
+                liveTickerFrame = requestAnimationFrame(liveTick);
             }
         }
 
@@ -490,6 +489,10 @@
                 acStatusText.textContent = 'ON';
                 acStatusText.classList.remove('text-slate-500');
                 acStatusText.classList.add('text-white');
+                
+                // Add running glow to the cost text
+                statCost.classList.add('text-emerald-500', 'drop-shadow-sm');
+                costBoltIcon.classList.add('text-emerald-500', 'animate-pulse');
 
                 // Show Spin Ring
                 document.getElementById('acSpinRing').classList.remove('opacity-0');
@@ -517,6 +520,10 @@
                 acStatusText.textContent = 'OFF';
                 acStatusText.classList.remove('text-white');
                 acStatusText.classList.add('text-slate-500');
+                
+                // Remove running glow
+                statCost.classList.remove('text-emerald-500', 'drop-shadow-sm');
+                costBoltIcon.classList.remove('text-emerald-500', 'animate-pulse');
 
                 // Hide Spin Ring
                 document.getElementById('acSpinRing').classList.remove('opacity-100');
@@ -546,16 +553,14 @@
             statToday.textContent = stats.today;
             statCycle.textContent = stats.cycle;
             statCost.textContent = stats.cost;
-            resetConfirmCost.textContent = `₱${stats.rawCost.toFixed(2)}`; // Keep modal formatted to 2 decimals
+            resetConfirmCost.textContent = `₱${stats.rawCost.toFixed(2)}`; 
         }
 
         function calculateUsageStats(events) {
             const now = Date.now();
             
-            // Today boundaries
             const startOfToday = new Date();
             startOfToday.setHours(0, 0, 0, 0);
-            // Don't count today usage from before the last reset
             const todayMs = Math.max(startOfToday.getTime(), lastResetTimestamp);
 
             let todayUsage = 0;
@@ -572,7 +577,6 @@
                 }
             });
 
-            // If still on, calculate up to right now
             if (activeStart) {
                 todayUsage += getOverlap(activeStart, now, todayMs, now);
                 cycleUsage += getOverlap(activeStart, now, lastResetTimestamp, now);
@@ -584,7 +588,7 @@
             return {
                 today: (todayUsage / (1000 * 60 * 60)).toFixed(2),
                 cycle: cycleHrs.toFixed(2),
-                cost: cost.toFixed(4), // 4 decimal places for a live "gas pump" effect
+                cost: cost.toFixed(4), 
                 rawCycleHrs: cycleHrs,
                 rawCost: cost
             };
@@ -604,7 +608,6 @@
                 return;
             }
 
-            // Display newest first
             const reversedEvents = [...allEvents].reverse();
             
             let html = '';
@@ -668,9 +671,8 @@
             billingHistoryFeed.innerHTML = html;
         }
 
-        // Reset Modal Logic
         openResetModalBtn.addEventListener('click', () => {
-            updateStatsUI(); // Ensure preview is recalculated to the exact second before opening
+            updateStatsUI(); 
             resetModal.classList.remove('opacity-0', 'pointer-events-none');
             setTimeout(() => resetModalContent.classList.remove('scale-95'), 10);
         });
@@ -693,6 +695,44 @@
             }
         });
 
+        const admin100HrBtn = document.getElementById('admin100HrBtn');
+        if (admin100HrBtn) {
+            admin100HrBtn.addEventListener('click', async () => {
+                if (!confirm("This will add exactly 100 hours to your current cycle. Continue?")) return;
+                
+                const now = Date.now();
+                const past100Hrs = now - (100 * 60 * 60 * 1000); 
+
+                try {
+                    admin100HrBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+                    
+                    const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config', 'main');
+                    await setDoc(configRef, { lastResetTimestamp: past100Hrs }, { merge: true });
+
+                    const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'ac_events');
+                    await addDoc(eventsRef, {
+                        type: 'ON',
+                        timestamp: past100Hrs,
+                        user: 'Admin Adjustment',
+                        userId: 'admin'
+                    });
+
+                    await addDoc(eventsRef, {
+                        type: 'OFF',
+                        timestamp: now,
+                        user: 'Admin Adjustment',
+                        userId: 'admin'
+                    });
+
+                    alert("Success! 100 hours added. You can now delete this button from the code if you want.");
+                    admin100HrBtn.style.display = 'none';
+                } catch (e) {
+                    alert("Error: " + e.message);
+                    admin100HrBtn.innerHTML = '<i class="fa-solid fa-wrench"></i> Start Fresh with 100 Hours';
+                }
+            });
+        }
+
         confirmResetBtn.addEventListener('click', async () => {
             if (!currentUser) return;
             
@@ -703,7 +743,6 @@
                 const now = Date.now();
                 const stats = calculateUsageStats(allEvents);
                 
-                // If there's actual usage, save it to history
                 if (stats.rawCycleHrs > 0.01) {
                     const historyRef = collection(db, 'artifacts', appId, 'public', 'data', 'billing_history');
                     await addDoc(historyRef, {
@@ -715,7 +754,6 @@
                     });
                 }
 
-                // Update the global reset timestamp for everyone
                 const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config', 'main');
                 await setDoc(configRef, { lastResetTimestamp: now }, { merge: true });
                 
@@ -732,7 +770,6 @@
         acToggleButton.addEventListener('click', async () => {
             if (!currentUser || isProcessingAction) return;
             
-            // Prevent fast clicking
             isProcessingAction = true;
             acToggleButton.disabled = true;
             acToggleButton.classList.add('opacity-80', 'scale-95');
@@ -758,7 +795,6 @@
             }
         });
 
-        // Utilities
         function formatRelativeTime(timestampMs) {
             const date = new Date(timestampMs);
             const now = new Date();
@@ -797,7 +833,6 @@
                  .replace(/'/g, "&#039;");
         }
 
-        // Start App
         initialize();
 
     </script>
