@@ -47,12 +47,19 @@
         }
     </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200 flex flex-col">
+<body id="appBody" class="text-slate-800 antialiased min-h-screen bg-slate-200 flex flex-col transition-colors duration-1000">
 
     <!-- App Container -->
-    <div class="min-h-screen flex flex-col max-w-md w-full mx-auto bg-white shadow-2xl relative overflow-hidden">
+    <div id="appContainer" class="min-h-screen flex flex-col max-w-md w-full mx-auto bg-white shadow-2xl relative overflow-hidden transition-colors duration-1000">
+        
+        <!-- Snow Animation Canvas -->
+        <canvas id="snowCanvas" class="absolute inset-0 z-[44] pointer-events-none opacity-0 transition-opacity duration-1000"></canvas>
+
         <!-- Background decorative glow for app container -->
         <div class="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-indigo-50/50 to-transparent pointer-events-none"></div>
+        
+        <!-- Dynamic ON Gradient -->
+        <div id="acOnGradient" class="absolute top-0 left-0 w-full h-[450px] bg-gradient-to-b from-blue-400 via-blue-200/90 to-transparent opacity-0 transition-opacity duration-1000 pointer-events-none z-[1]"></div>
         
         <!-- Header -->
         <header class="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-lg border-b border-white/10 rounded-b-2xl backdrop-blur-sm">
@@ -528,6 +535,61 @@
             });
         }
 
+        const snowCanvas = document.getElementById('snowCanvas');
+        const snowCtx = snowCanvas ? snowCanvas.getContext('2d') : null;
+        let snowflakes = [];
+
+        function initSnow() {
+            if (!snowCanvas) return;
+            const parent = snowCanvas.parentElement;
+            snowCanvas.width = parent.clientWidth;
+            snowCanvas.height = parent.clientHeight;
+            // Generate 50 snowflakes with random starting parameters
+            snowflakes = Array.from({ length: 50 }, () => ({
+                x: Math.random() * snowCanvas.width,
+                y: Math.random() * snowCanvas.height,
+                r: Math.random() * 2.5 + 1, // random radius
+                vx: (Math.random() - 0.5) * 0.5, // horizontal wind
+                vy: Math.random() * 1.5 + 0.5, // vertical fall gravity
+                a: Math.random() * Math.PI * 2, // sine wave angle
+                va: Math.random() * 0.05 + 0.01 // wobble speed
+            }));
+        }
+
+        function renderSnow() {
+            if (!snowCtx) return;
+            snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+            snowCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            snowCtx.beginPath();
+            
+            // Draw all flakes
+            snowflakes.forEach(p => {
+                snowCtx.moveTo(p.x, p.y);
+                snowCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2, true);
+            });
+            snowCtx.fill();
+            
+            // Move flakes for next frame
+            snowflakes.forEach(p => {
+                p.a += p.va; // increment wobble angle
+                p.x += Math.sin(p.a) * 0.5 + p.vx; // add wobble to wind
+                p.y += p.vy; // fall down
+                
+                // Wrap around edges to create infinite loop
+                if (p.y > snowCanvas.height) {
+                    p.y = -10;
+                    p.x = Math.random() * snowCanvas.width;
+                }
+                if (p.x > snowCanvas.width + 10) p.x = -10;
+                if (p.x < -10) p.x = snowCanvas.width + 10;
+            });
+        }
+
+        // Adjust canvas if window is resized while running
+        window.addEventListener('resize', () => {
+            if (isAcOn) initSnow();
+        });
+
         function updateAppState() {
             let currentOnEvent = null;
             let lastEvent = null;
@@ -549,12 +611,30 @@
 
             // 60FPS fluid animation engine using requestAnimationFrame
             if (liveTickerFrame) cancelAnimationFrame(liveTickerFrame);
+            
             if (isAcOn) {
+                initSnow();
                 const liveTick = () => {
                     updateStatsUI();
+                    renderSnow(); // Draw the snow falling
                     liveTickerFrame = requestAnimationFrame(liveTick);
                 };
                 liveTickerFrame = requestAnimationFrame(liveTick);
+            } else {
+                // Let the app run briefly during the fade out so the snow doesn't just "freeze" instantly
+                let fadeTicks = 60; // 1 second of fade
+                const fadeTick = () => {
+                    updateStatsUI();
+                    renderSnow();
+                    fadeTicks--;
+                    if (fadeTicks > 0) {
+                        liveTickerFrame = requestAnimationFrame(fadeTick);
+                    } else if (snowCtx) {
+                        // Clear the canvas entirely when the fade out is finished
+                        snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+                    }
+                };
+                liveTickerFrame = requestAnimationFrame(fadeTick);
             }
         }
 
@@ -564,9 +644,30 @@
 
             const isVisualOn = acIcon.classList.contains('fa-fan');
             const acIconWrapper = document.getElementById('acIconWrapper');
+            const snowCanvas = document.getElementById('snowCanvas');
+            const acOnGradient = document.getElementById('acOnGradient');
+            const appBody = document.getElementById('appBody');
+            const appContainer = document.getElementById('appContainer');
 
             if (isAcOn) {
                 // Style for ON
+                snowCanvas.classList.remove('opacity-0');
+                snowCanvas.classList.add('opacity-100');
+                
+                if (acOnGradient) {
+                    acOnGradient.classList.remove('opacity-0');
+                    acOnGradient.classList.add('opacity-100');
+                }
+                
+                if (appBody) {
+                    appBody.classList.remove('bg-slate-200', 'bg-blue-100');
+                    appBody.classList.add('bg-blue-300');
+                }
+                if (appContainer) {
+                    appContainer.classList.remove('bg-white');
+                    appContainer.classList.add('bg-blue-50');
+                }
+                
                 acToggleButton.classList.remove('bg-gradient-to-br', 'from-slate-50', 'to-slate-100', 'border-white', 'ac-btn-off', 'shadow-[0_10px_30px_rgba(0,0,0,0.05)]', 'bg-slate-100', 'border-slate-200');
                 acToggleButton.classList.add('bg-gradient-to-tr', 'from-blue-600', 'to-cyan-400', 'border-blue-300', 'ac-btn-on', 'shadow-lg');
                 
@@ -600,6 +701,23 @@
                 }
             } else {
                 // Style for OFF
+                snowCanvas.classList.add('opacity-0');
+                snowCanvas.classList.remove('opacity-100');
+                
+                if (acOnGradient) {
+                    acOnGradient.classList.add('opacity-0');
+                    acOnGradient.classList.remove('opacity-100');
+                }
+                
+                if (appBody) {
+                    appBody.classList.remove('bg-blue-300', 'bg-blue-100');
+                    appBody.classList.add('bg-slate-200');
+                }
+                if (appContainer) {
+                    appContainer.classList.remove('bg-blue-50');
+                    appContainer.classList.add('bg-white');
+                }
+                
                 acToggleButton.classList.remove('bg-gradient-to-tr', 'from-blue-600', 'to-cyan-400', 'border-blue-300', 'ac-btn-on', 'shadow-lg', 'bg-blue-500', 'border-blue-400');
                 acToggleButton.classList.add('bg-gradient-to-br', 'from-slate-50', 'to-slate-100', 'border-white', 'ac-btn-off', 'shadow-[0_10px_30px_rgba(0,0,0,0.05)]');
                 
