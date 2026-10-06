@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,9 +10,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4f46e5">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%234f46e5' rx='112'/%3E%3Crect x='112' y='176' width='288' height='128' fill='%23ffffff' rx='24'/%3E%3Crect x='144' y='272' width='224' height='16' fill='%23c7d2fe' rx='8'/%3E%3Cline x1='152' y1='216' x2='304' y2='216' stroke='%23c7d2fe' stroke-width='16' stroke-linecap='round'/%3E%3Cline x1='152' y1='244' x2='304' y2='244' stroke='%23c7d2fe' stroke-width='16' stroke-linecap='round'/%3E%3Ccircle cx='360' cy='230' r='16' fill='%23c7d2fe'/%3E%3Cpath d='M160 352 Q180 392 200 352 M236 362 Q256 402 276 362 M312 352 Q332 392 352 352' fill='none' stroke='%23ffffff' stroke-width='16' stroke-linecap='round'/%3E%3C/svg%3E">
     
-    <!-- We will inject the manifest dynamically via JS to satisfy Chrome's strict rules -->
+    <!-- Flat Vector AC App Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%232563eb' rx='112'/%3E%3Crect x='96' y='160' width='320' height='160' fill='%23ffffff' rx='32'/%3E%3Crect x='128' y='264' width='256' height='24' fill='%23dbeafe' rx='12'/%3E%3Cline x1='144' y1='208' x2='288' y2='208' stroke='%2393c5fd' stroke-width='16' stroke-linecap='round'/%3E%3Cline x1='144' y1='236' x2='240' y2='236' stroke='%2393c5fd' stroke-width='16' stroke-linecap='round'/%3E%3Ccircle cx='352' cy='212' r='20' fill='%233b82f6'/%3E%3Cpath d='M160 360 Q180 410 200 360 M256 370 Q276 420 296 370 M352 360 Q372 410 392 360' fill='none' stroke='%2360a5fa' stroke-width='24' stroke-linecap='round'/%3E%3C/svg%3E">
+    
     <link id="pwa-manifest" rel="manifest">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,7 +28,7 @@
         }
         
         .ac-btn-on {
-            box-shadow: 0 0 40px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 50px rgba(6, 182, 212, 0.5), inset 0 0 25px rgba(255, 255, 255, 0.4);
             animation: pulse-blue 2s infinite;
         }
         
@@ -35,12 +37,11 @@
         }
 
         @keyframes pulse-blue {
-            0% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.3); }
-            50% { box-shadow: 0 0 50px rgba(59, 130, 246, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.5); }
-            100% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.3); }
+            0% { box-shadow: 0 0 40px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.3); }
+            50% { box-shadow: 0 0 60px rgba(59, 130, 246, 0.7), inset 0 0 25px rgba(255, 255, 255, 0.6); }
+            100% { box-shadow: 0 0 40px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.3); }
         }
         
-        /* Ensures the numbers don't wiggle horizontally as they change */
         .fluid-numbers {
             font-variant-numeric: tabular-nums;
             letter-spacing: -0.02em;
@@ -54,26 +55,23 @@
         
         <!-- Snow Animation Canvas -->
         <canvas id="snowCanvas" class="absolute inset-0 z-[44] pointer-events-none opacity-0 transition-opacity duration-1000"></canvas>
-
-        <!-- Background decorative glow for app container -->
-        <div class="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-indigo-50/50 to-transparent pointer-events-none"></div>
         
         <!-- Dynamic ON Gradient -->
         <div id="acOnGradient" class="absolute top-0 left-0 w-full h-[450px] bg-gradient-to-b from-blue-400 via-blue-200/90 to-transparent opacity-0 transition-opacity duration-1000 pointer-events-none z-[1]"></div>
         
         <!-- Header -->
-        <header class="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-lg border-b border-white/10 rounded-b-2xl backdrop-blur-sm">
+        <header class="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-lg border-b border-white/20 rounded-b-3xl backdrop-blur-md">
             <div class="flex items-center gap-2">
-                <i class="fa-solid fa-snowflake text-xl drop-shadow-md"></i>
-                <h1 class="font-bold text-lg tracking-wide drop-shadow-sm">Dorm AC</h1>
+                <i class="fa-solid fa-snowflake text-2xl drop-shadow-md text-cyan-200"></i>
+                <h1 class="font-extrabold text-xl tracking-tight drop-shadow-sm">Dorm AC</h1>
             </div>
             <div class="flex items-center gap-2">
-                <button id="openSettingsBtn" class="text-sm bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 w-8 h-8 rounded-full transition-colors flex items-center justify-center shadow-sm">
+                <button id="openSettingsBtn" class="text-sm bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 w-9 h-9 rounded-full transition-colors flex items-center justify-center shadow-sm">
                     <i class="fa-solid fa-gear"></i>
                 </button>
-                <button id="editNameBtn" class="text-sm bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full transition-colors flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-user-pen"></i>
-                    <span id="headerUserName" class="max-w-[100px] truncate">Setup Profile</span>
+                <button id="editNameBtn" class="text-sm bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-2 shadow-sm font-medium">
+                    <i class="fa-solid fa-user-astronaut text-cyan-100"></i>
+                    <span id="headerUserName" class="max-w-[90px] truncate">Setup</span>
                 </button>
             </div>
         </header>
@@ -85,50 +83,50 @@
             <div class="flex flex-col items-center justify-center pt-2 relative z-10">
                 <button id="acToggleButton" disabled class="relative w-48 h-48 rounded-full flex flex-col items-center justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none bg-gradient-to-br from-slate-50 to-slate-100 border-4 border-white ac-btn-off shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
                     <!-- Spinning Blue Light Ring -->
-                    <div id="acSpinRing" class="absolute inset-[-8px] rounded-full border-[3px] border-transparent border-t-cyan-400 border-l-blue-500 opacity-0 transition-opacity duration-1000 animate-[spin_3s_linear_infinite]" style="box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);"></div>
+                    <div id="acSpinRing" class="absolute inset-[-8px] rounded-full border-[3px] border-transparent border-t-cyan-300 border-l-blue-400 opacity-0 transition-opacity duration-1000 animate-[spin_2s_linear_infinite]" style="box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);"></div>
                     
                     <div id="acIconWrapper" class="transition-all duration-300 transform mb-2 flex items-center justify-center h-[50px] relative z-10">
                         <i id="acIcon" class="fa-solid fa-power-off text-5xl text-slate-400 transition-colors duration-300 drop-shadow-sm"></i>
                     </div>
                     <span id="acStatusText" class="font-bold text-xl text-slate-500 tracking-wider transition-colors duration-300 relative z-10">OFF</span>
                 </button>
-                <div id="acLastAction" class="mt-6 text-sm text-slate-500 text-center min-h-[40px] opacity-0 transition-opacity duration-300 font-medium">
+                <div id="acLastAction" class="mt-6 text-sm text-slate-500 text-center min-h-[40px] opacity-0 transition-opacity duration-300 font-medium bg-white/50 backdrop-blur-sm px-4 py-1.5 rounded-full border border-white/20 shadow-sm">
                     Loading status...
                 </div>
             </div>
 
             <!-- Stats Dashboard -->
             <div class="grid grid-cols-2 gap-4 relative z-10">
-                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-blue-100/50 shadow-sm relative overflow-hidden">
-                    <div class="absolute -top-6 -right-6 w-20 h-20 bg-blue-400/10 rounded-full blur-xl"></div>
-                    <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 relative z-10">Today</span>
+                <div class="bg-gradient-to-br from-white to-blue-50/50 rounded-3xl p-5 flex flex-col items-center justify-center border border-white shadow-md relative overflow-hidden backdrop-blur-md">
+                    <div class="absolute -top-6 -right-6 w-24 h-24 bg-blue-400/10 rounded-full blur-2xl"></div>
+                    <span class="text-[10px] font-extrabold text-blue-500 uppercase tracking-widest mb-1 relative z-10 opacity-80">Today</span>
                     <div class="flex items-baseline gap-1 relative z-10">
-                        <span id="statToday" class="text-3xl font-black text-blue-700 fluid-numbers drop-shadow-sm">0.00</span>
-                        <span class="text-sm font-bold text-blue-600/80">hrs</span>
+                        <span id="statToday" class="text-4xl font-black text-slate-700 fluid-numbers drop-shadow-sm tracking-tight">0.00</span>
+                        <span class="text-sm font-bold text-slate-400">h</span>
                     </div>
                 </div>
-                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-indigo-100/50 shadow-sm relative overflow-hidden">
-                    <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-indigo-400/10 rounded-full blur-xl"></div>
-                    <span class="text-xs font-bold text-indigo-500 uppercase tracking-wider mb-1 relative z-10">Cycle Total</span>
+                <div class="bg-gradient-to-br from-white to-indigo-50/50 rounded-3xl p-5 flex flex-col items-center justify-center border border-white shadow-md relative overflow-hidden backdrop-blur-md">
+                    <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-indigo-400/10 rounded-full blur-2xl"></div>
+                    <span class="text-[10px] font-extrabold text-indigo-500 uppercase tracking-widest mb-1 relative z-10 opacity-80">Cycle Total</span>
                     <div class="flex items-baseline gap-1 relative z-10">
-                        <span id="statCycle" class="text-3xl font-black text-indigo-700 fluid-numbers drop-shadow-sm">0.00</span>
-                        <span class="text-sm font-bold text-indigo-600/80">hrs</span>
+                        <span id="statCycle" class="text-4xl font-black text-slate-700 fluid-numbers drop-shadow-sm tracking-tight">0.00</span>
+                        <span class="text-sm font-bold text-slate-400">h</span>
                     </div>
                 </div>
                 <!-- Cost Estimate Row -->
-                <div class="col-span-2 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl p-4 flex justify-between items-center border border-emerald-100/50 shadow-sm transition-all duration-300 relative overflow-hidden" id="costContainer">
-                    <div class="absolute top-0 right-1/4 w-32 h-32 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="col-span-2 bg-gradient-to-r from-yellow-50 via-amber-50/40 to-orange-50 rounded-3xl p-5 flex justify-between items-center border border-amber-200/50 shadow-md transition-all duration-300 relative overflow-hidden backdrop-blur-md" id="costContainer">
+                    <div class="absolute top-0 right-1/4 w-32 h-32 bg-orange-400/15 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="flex flex-col relative z-10">
-                        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <span class="text-[10px] font-extrabold text-orange-500 uppercase tracking-widest mb-1 flex items-center gap-1.5 opacity-90">
                             <i id="costBoltIcon" class="fa-solid fa-bolt transition-colors duration-300"></i> Est. Cost (<span id="costRateLabel">₱15.39/kWh</span>)
                         </span>
                         <div class="flex items-baseline gap-1">
-                            <span class="text-2xl font-black text-emerald-700 drop-shadow-sm">₱</span>
-                            <span id="statCost" class="text-3xl font-black text-emerald-700 fluid-numbers transition-colors duration-300 drop-shadow-sm">0.0000</span>
+                            <span class="text-2xl font-black text-slate-700 drop-shadow-sm">₱</span>
+                            <span id="statCost" class="text-4xl font-black text-slate-700 fluid-numbers transition-colors duration-300 drop-shadow-sm tracking-tight">0.0000</span>
                         </div>
                     </div>
-                    <button id="openResetModalBtn" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow-[0_4px_15px_rgba(16,185,129,0.3)] border border-emerald-400/30 transition-all active:scale-95 flex items-center gap-2 relative z-10">
-                        <i class="fa-solid fa-file-invoice"></i> Log & Reset
+                    <button id="openResetModalBtn" class="bg-gradient-to-tr from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm font-bold py-3 px-5 rounded-2xl shadow-[0_8px_20px_rgba(245,158,11,0.25)] border border-orange-400/50 transition-all active:scale-95 flex items-center gap-2 relative z-10">
+                        <i class="fa-solid fa-file-invoice"></i> Log
                     </button>
                 </div>
             </div>
@@ -136,9 +134,9 @@
             <!-- Billing History -->
             <div class="flex flex-col relative z-10">
                 <div class="flex justify-between items-end mb-3 px-1">
-                    <h2 class="font-bold text-slate-700">Billing History</h2>
+                    <h2 class="font-extrabold text-slate-700 tracking-tight">Billing History</h2>
                 </div>
-                <div id="billingHistoryFeed" class="bg-gradient-to-b from-white to-slate-50 rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3 relative overflow-hidden">
+                <div id="billingHistoryFeed" class="bg-white/80 backdrop-blur-md rounded-3xl p-4 border border-white shadow-md space-y-3 relative overflow-hidden">
                     <div class="text-center text-sm text-slate-400 py-4 italic">No past cycles logged yet.</div>
                 </div>
             </div>
@@ -147,15 +145,14 @@
             <div class="flex flex-col relative z-10">
                 <button id="toggleActivityLogBtn" class="flex justify-between items-center mb-3 px-1 w-full focus:outline-none transition-opacity hover:opacity-70 text-left">
                     <div class="flex items-center gap-2">
-                        <h2 class="font-bold text-slate-700">Activity Log</h2>
+                        <h2 class="font-extrabold text-slate-700 tracking-tight">Activity Log</h2>
                         <i id="activityLogChevron" class="fa-solid fa-chevron-up text-xs text-slate-400 transition-transform duration-300"></i>
                     </div>
-                    <span class="text-xs font-bold text-slate-400 bg-slate-200/50 px-2 py-0.5 rounded-full" id="logCount">0 events</span>
+                    <span class="text-xs font-bold text-slate-500 bg-white/60 shadow-sm border border-white/50 px-3 py-1 rounded-full backdrop-blur-sm" id="logCount">0 sessions</span>
                 </button>
-                <!-- Wrapper for collapsing -->
                 <div id="activityLogWrapper">
-                    <div id="activityFeed" class="bg-gradient-to-b from-white to-slate-50 rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3 relative overflow-hidden">
-                        <!-- Feed items will be injected here -->
+                    <div id="activityFeed" class="bg-white/80 backdrop-blur-md rounded-3xl p-4 border border-white shadow-md relative overflow-hidden">
+                        <!-- Feed items injected here -->
                         <div class="text-center text-sm text-slate-400 py-4 italic">Loading history...</div>
                     </div>
                 </div>
@@ -165,27 +162,26 @@
     </div>
 
     <!-- Loading Overlay -->
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300">
-        <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center gap-4 text-center">
-            <i class="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-600"></i>
+        <div class="bg-white p-6 rounded-3xl shadow-2xl flex flex-col items-center gap-4 text-center border border-white/20">
+            <i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-600"></i>
             <p class="text-sm font-semibold text-slate-600">Connecting to Dorm...</p>
         </div>
     </div>
 
     <!-- Name Setup Modal -->
     <div id="nameModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
-        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white/20 relative overflow-hidden" id="nameModalContent">
+        <div class="bg-white rounded-[2rem] shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white relative overflow-hidden" id="nameModalContent">
             <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-transparent pointer-events-none"></div>
             <div class="text-center mb-6 relative z-10">
                 <div class="w-16 h-16 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
                     <i class="fa-solid fa-user-astronaut text-2xl text-indigo-600 drop-shadow-sm"></i>
                 </div>
-                <h2 class="text-xl font-bold text-slate-800">Who's tracking?</h2>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Who's tracking?</h2>
                 <p class="text-sm text-slate-500 mt-1">Enter your name so your dormmates know who turned the AC on or off.</p>
             </div>
-            <input type="text" id="nameInput" placeholder="e.g., Alex, Room 2B..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium text-center mb-4 relative z-10 shadow-sm inset-shadow-sm">
-            <button id="saveNameBtn" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-[0_4px_15px_rgba(79,70,229,0.3)] border border-indigo-500/30 relative z-10">
+            <input type="text" id="nameInput" placeholder="e.g., Alex, Room 2B..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-center mb-4 relative z-10 shadow-inner">
+            <button id="saveNameBtn" class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold py-3.5 rounded-2xl transition-all shadow-[0_8px_20px_rgba(59,130,246,0.3)] active:scale-95 relative z-10">
                 Save & Continue
             </button>
         </div>
@@ -193,21 +189,21 @@
 
     <!-- Reset Confirmation Modal -->
     <div id="resetModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
-        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white/20 relative overflow-hidden" id="resetModalContent">
-            <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-red-50 to-transparent pointer-events-none"></div>
+        <div class="bg-white rounded-[2rem] shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white relative overflow-hidden" id="resetModalContent">
+            <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-orange-50 to-transparent pointer-events-none"></div>
             <div class="text-center mb-6 relative z-10">
-                <div class="w-16 h-16 bg-gradient-to-br from-red-100 to-rose-100 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
-                    <i class="fa-solid fa-triangle-exclamation text-2xl text-red-600 drop-shadow-sm"></i>
+                <div class="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i class="fa-solid fa-money-bill-wave text-2xl text-orange-600 drop-shadow-sm"></i>
                 </div>
-                <h2 class="text-xl font-bold text-slate-800">Log & Reset Cycle?</h2>
-                <p class="text-sm text-slate-500 mt-2">This will save your current total of <strong id="resetConfirmCost" class="text-emerald-600">₱0.00</strong> to the history and restart the tracking from zero.</p>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Log & Reset Cycle?</h2>
+                <p class="text-sm text-slate-500 mt-2">This will save your current total of <strong id="resetConfirmCost" class="text-orange-600 text-base">₱0.00</strong> to the history and restart the tracking from zero.</p>
             </div>
             <div class="flex gap-3 relative z-10">
-                <button id="cancelResetBtn" class="flex-1 bg-gradient-to-b from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-700 font-bold py-3 rounded-xl transition-colors shadow-sm border border-slate-200">
+                <button id="cancelResetBtn" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 rounded-2xl transition-colors">
                     Cancel
                 </button>
-                <button id="confirmResetBtn" class="flex-1 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-3 rounded-xl transition-colors shadow-[0_4px_15px_rgba(225,29,72,0.3)] border border-red-500/30">
-                    Yes, Reset
+                <button id="confirmResetBtn" class="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-3.5 rounded-2xl transition-all shadow-[0_8px_20px_rgba(245,158,11,0.3)] active:scale-95">
+                    Yes, Save it
                 </button>
             </div>
         </div>
@@ -215,67 +211,85 @@
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
-        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white/20 relative overflow-hidden" id="settingsModalContent">
-            <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-transparent pointer-events-none"></div>
+        <div class="bg-white rounded-[2rem] shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white relative overflow-hidden" id="settingsModalContent">
+            <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-50 to-transparent pointer-events-none"></div>
             
             <div class="flex justify-between items-start mb-6 relative z-10">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center shadow-inner">
-                        <i class="fa-solid fa-sliders text-xl text-indigo-600 drop-shadow-sm"></i>
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full flex items-center justify-center shadow-inner">
+                        <i class="fa-solid fa-sliders text-xl text-blue-600 drop-shadow-sm"></i>
                     </div>
                     <div>
-                        <h2 class="text-lg font-bold text-slate-800 leading-tight">App Settings</h2>
-                        <p class="text-xs text-slate-500">Syncs for all roommates</p>
+                        <h2 class="text-lg font-extrabold text-slate-800 leading-tight tracking-tight">App Settings</h2>
+                        <p class="text-xs text-slate-500 font-medium">Syncs for all roommates</p>
                     </div>
                 </div>
-                <button id="closeSettingsBtn" class="text-slate-400 hover:text-slate-600 p-2 transition-colors">
-                    <i class="fa-solid fa-xmark text-xl"></i>
+                <button id="closeSettingsBtn" class="text-slate-400 hover:text-slate-600 p-2 bg-slate-50 rounded-full transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             
             <div class="space-y-4 relative z-10 mb-6">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Meralco Rate (₱/kWh)</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Meralco Rate (₱/kWh)</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <span class="text-slate-500 font-bold">₱</span>
                         </div>
-                        <input type="number" id="rateInput" step="0.01" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium shadow-sm inset-shadow-sm">
+                        <input type="number" id="rateInput" step="0.01" class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-9 pr-4 py-3.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium shadow-inner">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">AC Wattage (Watts)</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">AC Wattage (Watts)</label>
                     <div class="relative">
-                        <input type="number" id="wattageInput" step="10" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-medium shadow-sm inset-shadow-sm">
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <span class="text-slate-400 text-sm font-medium">W</span>
+                        <input type="number" id="wattageInput" step="10" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium shadow-inner">
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                            <span class="text-slate-400 text-sm font-bold">W</span>
                         </div>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-1.5">A standard 1HP non-inverter is ~1000W.</p>
+                    <p class="text-[11px] text-slate-400 mt-2 font-medium">A standard 1HP non-inverter is ~1000W.</p>
                 </div>
             </div>
             
-            <button id="saveSettingsBtn" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-[0_4px_15px_rgba(79,70,229,0.3)] border border-indigo-500/30 relative z-10">
+            <button id="saveSettingsBtn" class="w-full bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white font-bold py-3.5 rounded-2xl transition-all shadow-[0_8px_20px_rgba(15,23,42,0.2)] active:scale-95 relative z-10">
                 Save Changes
             </button>
         </div>
     </div>
 
+    <!-- Delete Session Confirmation Modal -->
+    <div id="deleteEventModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <div class="bg-white rounded-[2rem] shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white relative overflow-hidden" id="deleteEventModalContent">
+            <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-red-50 to-transparent pointer-events-none"></div>
+            <div class="text-center mb-6 relative z-10">
+                <div class="w-16 h-16 bg-gradient-to-br from-red-100 to-rose-100 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i class="fa-solid fa-trash-can text-2xl text-red-600 drop-shadow-sm"></i>
+                </div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Delete Session?</h2>
+                <p class="text-sm text-slate-500 mt-2">Are you sure you want to delete this entire session? This will remove the ON and OFF logs and automatically recalculate the cycle's total hours.</p>
+            </div>
+            <div class="flex gap-3 relative z-10">
+                <button id="cancelDeleteEventBtn" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 rounded-2xl transition-colors">
+                    Cancel
+                </button>
+                <button id="confirmDeleteEventBtn" class="flex-1 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white font-bold py-3.5 rounded-2xl transition-all shadow-[0_8px_20px_rgba(225,29,72,0.3)] active:scale-95">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Error Toast -->
-    <div id="errorToast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg z-[70] font-medium text-sm flex items-center gap-2 transition-all duration-300 opacity-0 -translate-y-full pointer-events-none">
-        <i class="fa-solid fa-circle-exclamation"></i>
+    <div id="errorToast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl z-[70] font-bold text-sm flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-full pointer-events-none border border-slate-700">
+        <i class="fa-solid fa-circle-exclamation text-red-400 text-lg"></i>
         <span id="errorMsg">Something went wrong.</span>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // =========================================================================
-        // 🚨 IMPORTANT: PASTE YOUR FIREBASE CONFIGURATION HERE 🚨
-        // Replace the "YOUR_API_KEY" strings with the ones you get from Firebase
-        // =========================================================================
         const myCustomFirebaseConfig = {
             apiKey: "AIzaSyD1_ua2sTTb1ZELPaW2SI0tnu8mGOK6bDs",
             authDomain: "dorm-ac-tracker.firebaseapp.com",
@@ -284,7 +298,6 @@
             messagingSenderId: "746576139956",
             appId: "1:746576139956:web:658be45c5a5dc9045669e1"
         };
-        // =========================================================================
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : myCustomFirebaseConfig;
         
@@ -298,7 +311,6 @@
         let isAcOn = false;
         let isProcessingAction = false;
         
-        // Use requestAnimationFrame instead of setInterval for 60fps smoothness
         let liveTickerFrame = null; 
         
         // App Settings Configuration
@@ -352,18 +364,36 @@
         const activityLogChevron = document.getElementById('activityLogChevron');
         let isActivityLogOpen = true; 
 
+        const deleteEventModal = document.getElementById('deleteEventModal');
+        const deleteEventModalContent = document.getElementById('deleteEventModalContent');
+        const cancelDeleteEventBtn = document.getElementById('cancelDeleteEventBtn');
+        const confirmDeleteEventBtn = document.getElementById('confirmDeleteEventBtn');
+        let sessionToDeleteIds = { on: null, off: null };
+
         const errorToast = document.getElementById('errorToast');
         const errorMsg = document.getElementById('errorMsg');
 
-        // Helpers
+        function sanitizeData(value, fallback = 0) {
+            if (value === null || value === undefined) return fallback;
+            if (typeof value === 'number') {
+                return isNaN(value) ? fallback : value;
+            }
+            if (value.toMillis && typeof value.toMillis === 'function') {
+                return value.toMillis();
+            }
+            if (value.seconds !== undefined) {
+                return value.seconds * 1000;
+            }
+            const parsed = parseFloat(value);
+            return isNaN(parsed) ? fallback : parsed;
+        }
+
         function showError(message) {
             errorMsg.textContent = message;
-            errorToast.classList.remove('opacity-0', '-translate-y-full');
-            errorToast.classList.add('opacity-100', 'translate-y-0');
+            errorToast.classList.remove('opacity-0', '-translate-y-full', 'pointer-events-none');
             setTimeout(() => {
-                errorToast.classList.add('opacity-0', '-translate-y-full');
-                errorToast.classList.remove('opacity-100', 'translate-y-0');
-            }, 3000);
+                errorToast.classList.add('opacity-0', '-translate-y-full', 'pointer-events-none');
+            }, 4000);
         }
 
         function hideLoading() {
@@ -373,13 +403,6 @@
 
         async function initialize() {
             try {
-                if (firebaseConfig.apiKey === "YOUR_API_KEY_HERE") {
-                    document.querySelector('.fa-circle-notch').classList.remove('fa-spin');
-                    document.querySelector('.fa-circle-notch').classList.replace('fa-circle-notch', 'fa-triangle-exclamation');
-                    document.querySelector('#loadingOverlay p').innerHTML = "<b>Database Missing!</b><br>Please follow the guide to add your Firebase config keys in the code.";
-                    return;
-                }
-
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
@@ -403,7 +426,7 @@
                 showError("Failed to connect. Check your Firebase config.");
                 document.querySelector('.fa-circle-notch').classList.remove('fa-spin');
                 document.querySelector('.fa-circle-notch').classList.replace('fa-circle-notch', 'fa-triangle-exclamation');
-                document.querySelector('#loadingOverlay p').innerHTML = "<b>Connection Failed.</b><br>Check console for errors.";
+                document.querySelector('#loadingOverlay p').innerHTML = "<b>Connection Failed.</b>";
             }
         }
 
@@ -422,7 +445,6 @@
                     }
                     resolve();
                 }, (error) => {
-                    console.error("Profile sync error:", error);
                     resolve(); 
                 });
             });
@@ -451,14 +473,13 @@
             if (!name) return showError("Please enter a name");
             
             saveNameBtn.disabled = true;
-            saveNameBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            saveNameBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             
             try {
                 const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid);
                 await setDoc(profileRef, { name: name }, { merge: true });
                 hideNameModal();
             } catch (error) {
-                console.error("Error saving name:", error);
                 showError("Could not save name.");
             } finally {
                 saveNameBtn.disabled = false;
@@ -468,14 +489,6 @@
 
         editNameBtn.addEventListener('click', showNameModal);
 
-        function sanitizeNumber(val) {
-            if (!val) return 0;
-            if (typeof val === 'number') return val;
-            if (val.toMillis) return val.toMillis(); 
-            if (val.seconds) return val.seconds * 1000;
-            return Number(val) || 0;
-        }
-
         function startRealtimeSync() {
             const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'ac_events');
             const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config', 'main');
@@ -484,16 +497,15 @@
             onSnapshot(configRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    appConfig.lastResetTimestamp = sanitizeNumber(data.lastResetTimestamp);
+                    appConfig.lastResetTimestamp = sanitizeData(data.lastResetTimestamp, 0);
                     
-                    if (data.meralcoRatePhp) appConfig.meralcoRatePhp = parseFloat(data.meralcoRatePhp);
-                    if (data.acPowerKw) appConfig.acPowerKw = parseFloat(data.acPowerKw);
+                    if (data.meralcoRatePhp) appConfig.meralcoRatePhp = sanitizeData(data.meralcoRatePhp, 15.39);
+                    if (data.acPowerKw) appConfig.acPowerKw = sanitizeData(data.acPowerKw, 1.0);
                     
-                    // Update UI labels
                     costRateLabel.textContent = `₱${appConfig.meralcoRatePhp.toFixed(2)}/kWh`;
                 }
                 updateAppState();
-            }, (error) => console.error("Config sync error", error));
+            });
 
             onSnapshot(historyRef, (snapshot) => {
                 const rawHistory = [];
@@ -502,35 +514,38 @@
                     rawHistory.push({ 
                         id: doc.id, 
                         ...data,
-                        startDate: sanitizeNumber(data.startDate),
-                        endDate: sanitizeNumber(data.endDate),
-                        totalCost: sanitizeNumber(data.totalCost),
-                        totalHours: sanitizeNumber(data.totalHours)
+                        startDate: sanitizeData(data.startDate),
+                        endDate: sanitizeData(data.endDate),
+                        totalCost: sanitizeData(data.totalCost),
+                        totalHours: sanitizeData(data.totalHours)
                     });
                 });
                 
-                billingHistory = rawHistory.sort((a, b) => b.endDate - a.endDate); 
+                billingHistory = rawHistory.sort((a, b) => {
+                    const bTime = b.endDate || 0;
+                    const aTime = a.endDate || 0;
+                    return bTime - aTime;
+                });
                 updateHistoryUI();
-            }, (error) => console.error("History sync error", error));
+            });
 
             onSnapshot(eventsRef, (snapshot) => {
                 const rawEvents = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    rawEvents.push({ 
-                        id: doc.id, 
-                        ...data,
-                        timestamp: sanitizeNumber(data.timestamp)
-                    });
+                    const cleanTimestamp = sanitizeData(data.timestamp);
+                    if (cleanTimestamp > 0) {
+                        rawEvents.push({ 
+                            id: doc.id, 
+                            ...data,
+                            timestamp: cleanTimestamp
+                        });
+                    }
                 });
                 
                 allEvents = rawEvents.sort((a, b) => a.timestamp - b.timestamp);
                 
                 updateAppState();
-                hideLoading();
-            }, (error) => {
-                console.error("Events sync error:", error);
-                showError("Error syncing AC data.");
                 hideLoading();
             });
         }
@@ -544,38 +559,34 @@
             const parent = snowCanvas.parentElement;
             snowCanvas.width = parent.clientWidth;
             snowCanvas.height = parent.clientHeight;
-            // Generate 50 snowflakes with random starting parameters
-            snowflakes = Array.from({ length: 50 }, () => ({
+            snowflakes = Array.from({ length: 60 }, () => ({
                 x: Math.random() * snowCanvas.width,
                 y: Math.random() * snowCanvas.height,
-                r: Math.random() * 2.5 + 1, // random radius
-                vx: (Math.random() - 0.5) * 0.5, // horizontal wind
-                vy: Math.random() * 1.5 + 0.5, // vertical fall gravity
-                a: Math.random() * Math.PI * 2, // sine wave angle
-                va: Math.random() * 0.05 + 0.01 // wobble speed
+                r: Math.random() * 2 + 1, 
+                vx: (Math.random() - 0.5) * 0.5, 
+                vy: Math.random() * 1.5 + 1, 
+                a: Math.random() * Math.PI * 2, 
+                va: Math.random() * 0.03 + 0.01 
             }));
         }
 
         function renderSnow() {
             if (!snowCtx) return;
             snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
-            snowCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            snowCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
             snowCtx.beginPath();
             
-            // Draw all flakes
             snowflakes.forEach(p => {
                 snowCtx.moveTo(p.x, p.y);
                 snowCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2, true);
             });
             snowCtx.fill();
             
-            // Move flakes for next frame
             snowflakes.forEach(p => {
-                p.a += p.va; // increment wobble angle
-                p.x += Math.sin(p.a) * 0.5 + p.vx; // add wobble to wind
-                p.y += p.vy; // fall down
+                p.a += p.va; 
+                p.x += Math.sin(p.a) * 0.5 + p.vx; 
+                p.y += p.vy; 
                 
-                // Wrap around edges to create infinite loop
                 if (p.y > snowCanvas.height) {
                     p.y = -10;
                     p.x = Math.random() * snowCanvas.width;
@@ -585,7 +596,6 @@
             });
         }
 
-        // Adjust canvas if window is resized while running
         window.addEventListener('resize', () => {
             if (isAcOn) initSnow();
         });
@@ -609,20 +619,18 @@
             updateStatsUI();
             updateActivityFeed();
 
-            // 60FPS fluid animation engine using requestAnimationFrame
             if (liveTickerFrame) cancelAnimationFrame(liveTickerFrame);
             
             if (isAcOn) {
                 initSnow();
                 const liveTick = () => {
                     updateStatsUI();
-                    renderSnow(); // Draw the snow falling
+                    renderSnow(); 
                     liveTickerFrame = requestAnimationFrame(liveTick);
                 };
                 liveTickerFrame = requestAnimationFrame(liveTick);
             } else {
-                // Let the app run briefly during the fade out so the snow doesn't just "freeze" instantly
-                let fadeTicks = 60; // 1 second of fade
+                let fadeTicks = 60; 
                 const fadeTick = () => {
                     updateStatsUI();
                     renderSnow();
@@ -630,7 +638,6 @@
                     if (fadeTicks > 0) {
                         liveTickerFrame = requestAnimationFrame(fadeTick);
                     } else if (snowCtx) {
-                        // Clear the canvas entirely when the fade out is finished
                         snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
                     }
                 };
@@ -650,7 +657,6 @@
             const appContainer = document.getElementById('appContainer');
 
             if (isAcOn) {
-                // Style for ON
                 snowCanvas.classList.remove('opacity-0');
                 snowCanvas.classList.add('opacity-100');
                 
@@ -659,33 +665,20 @@
                     acOnGradient.classList.add('opacity-100');
                 }
                 
-                if (appBody) {
-                    appBody.classList.remove('bg-slate-200', 'bg-blue-100');
-                    appBody.classList.add('bg-blue-300');
-                }
-                if (appContainer) {
-                    appContainer.classList.remove('bg-white');
-                    appContainer.classList.add('bg-blue-50');
-                }
+                if (appBody) appBody.classList.replace('bg-slate-200', 'bg-blue-300');
+                if (appContainer) appContainer.classList.replace('bg-white', 'bg-blue-50');
                 
-                acToggleButton.classList.remove('bg-gradient-to-br', 'from-slate-50', 'to-slate-100', 'border-white', 'ac-btn-off', 'shadow-[0_10px_30px_rgba(0,0,0,0.05)]', 'bg-slate-100', 'border-slate-200');
-                acToggleButton.classList.add('bg-gradient-to-tr', 'from-blue-600', 'to-cyan-400', 'border-blue-300', 'ac-btn-on', 'shadow-lg');
+                acToggleButton.classList.remove('bg-gradient-to-br', 'from-slate-50', 'to-slate-100', 'border-white', 'ac-btn-off', 'shadow-[0_10px_30px_rgba(0,0,0,0.05)]');
+                acToggleButton.classList.add('bg-gradient-to-tr', 'from-blue-500', 'to-cyan-400', 'border-blue-200', 'ac-btn-on');
                 
                 acStatusText.textContent = 'ON';
-                acStatusText.classList.remove('text-slate-500');
-                acStatusText.classList.add('text-white');
+                acStatusText.classList.replace('text-slate-500', 'text-white');
                 
-                // Add running glow to the cost text
-                statCost.classList.remove('text-emerald-700');
-                statCost.classList.add('text-emerald-500', 'drop-shadow-md');
-                costBoltIcon.classList.remove('text-emerald-600');
-                costBoltIcon.classList.add('text-emerald-500', 'animate-pulse');
+                statCost.classList.replace('text-slate-700', 'text-orange-600');
+                costBoltIcon.classList.add('animate-pulse');
 
-                // Show Spin Ring
                 document.getElementById('acSpinRing').classList.remove('opacity-0');
-                document.getElementById('acSpinRing').classList.add('opacity-100');
 
-                // Morph Icon
                 if (!isVisualOn) {
                     acIconWrapper.classList.add('scale-0', 'rotate-180', 'opacity-0');
                     setTimeout(() => {
@@ -696,46 +689,31 @@
                 }
 
                 if (currentOnEvent) {
-                    const timeString = formatRelativeTime(currentOnEvent.timestamp);
-                    acLastAction.innerHTML = `Turned ON by <span class="font-bold text-slate-700">${escapeHtml(currentOnEvent.user)}</span><br>${timeString}`;
+                    acLastAction.innerHTML = `Running • Turned ON by <span class="font-bold text-slate-800">${escapeHtml(currentOnEvent.user)}</span>`;
                 }
             } else {
-                // Style for OFF
-                snowCanvas.classList.add('opacity-0');
                 snowCanvas.classList.remove('opacity-100');
+                snowCanvas.classList.add('opacity-0');
                 
                 if (acOnGradient) {
-                    acOnGradient.classList.add('opacity-0');
                     acOnGradient.classList.remove('opacity-100');
+                    acOnGradient.classList.add('opacity-0');
                 }
                 
-                if (appBody) {
-                    appBody.classList.remove('bg-blue-300', 'bg-blue-100');
-                    appBody.classList.add('bg-slate-200');
-                }
-                if (appContainer) {
-                    appContainer.classList.remove('bg-blue-50');
-                    appContainer.classList.add('bg-white');
-                }
+                if (appBody) appBody.classList.replace('bg-blue-300', 'bg-slate-200');
+                if (appContainer) appContainer.classList.replace('bg-blue-50', 'bg-white');
                 
-                acToggleButton.classList.remove('bg-gradient-to-tr', 'from-blue-600', 'to-cyan-400', 'border-blue-300', 'ac-btn-on', 'shadow-lg', 'bg-blue-500', 'border-blue-400');
+                acToggleButton.classList.remove('bg-gradient-to-tr', 'from-blue-500', 'to-cyan-400', 'border-blue-200', 'ac-btn-on');
                 acToggleButton.classList.add('bg-gradient-to-br', 'from-slate-50', 'to-slate-100', 'border-white', 'ac-btn-off', 'shadow-[0_10px_30px_rgba(0,0,0,0.05)]');
                 
                 acStatusText.textContent = 'OFF';
-                acStatusText.classList.remove('text-white');
-                acStatusText.classList.add('text-slate-500');
+                acStatusText.classList.replace('text-white', 'text-slate-500');
                 
-                // Remove running glow
-                statCost.classList.remove('text-emerald-500', 'drop-shadow-md');
-                statCost.classList.add('text-emerald-700');
-                costBoltIcon.classList.remove('text-emerald-500', 'animate-pulse');
-                costBoltIcon.classList.add('text-emerald-600');
+                statCost.classList.replace('text-orange-600', 'text-slate-700');
+                costBoltIcon.classList.remove('animate-pulse');
 
-                // Hide Spin Ring
-                document.getElementById('acSpinRing').classList.remove('opacity-100');
                 document.getElementById('acSpinRing').classList.add('opacity-0');
 
-                // Morph Icon
                 if (isVisualOn) {
                     acIconWrapper.classList.add('scale-0', '-rotate-180', 'opacity-0');
                     setTimeout(() => {
@@ -746,8 +724,7 @@
                 }
 
                 if (lastEvent && lastEvent.type === 'OFF') {
-                    const timeString = formatRelativeTime(lastEvent.timestamp);
-                    acLastAction.innerHTML = `Turned OFF by <span class="font-bold text-slate-700">${escapeHtml(lastEvent.user)}</span><br>${timeString}`;
+                    acLastAction.innerHTML = `Turned OFF by <span class="font-bold text-slate-700">${escapeHtml(lastEvent.user)}</span>`;
                 } else {
                     acLastAction.innerHTML = "AC is currently OFF";
                 }
@@ -806,36 +783,120 @@
             return Math.max(0, oEnd - oStart);
         }
 
+        function formatTimeOnly(timestamp) {
+            return new Date(timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        }
+
         function updateActivityFeed() {
-            logCount.textContent = `${allEvents.length} events`;
+            // Group events into sessions
+            const sessions = [];
+            let currentOn = null;
+
+            allEvents.forEach(evt => {
+                if (evt.type === 'ON') {
+                    currentOn = evt;
+                } else if (evt.type === 'OFF') {
+                    if (currentOn) {
+                        sessions.push({ on: currentOn, off: evt, status: 'completed' });
+                        currentOn = null;
+                    } else {
+                        sessions.push({ on: null, off: evt, status: 'orphan' });
+                    }
+                }
+            });
+            if (currentOn) {
+                sessions.push({ on: currentOn, off: null, status: 'active' });
+            }
+
+            sessions.reverse(); 
+            logCount.textContent = `${sessions.length} sessions`;
             
-            if (allEvents.length === 0) {
-                activityFeed.innerHTML = '<div class="text-center text-sm text-slate-400 py-4 italic mt-4">No AC activity logged yet.</div>';
+            if (sessions.length === 0) {
+                activityFeed.innerHTML = '<div class="text-center text-sm text-slate-400 py-4 italic mt-2">No AC sessions logged yet.</div>';
+                activityFeed.classList.add('border-white', 'shadow-md');
+                activityFeed.classList.remove('bg-transparent', 'shadow-none', 'border-transparent', 'p-0');
                 return;
             }
 
-            const reversedEvents = [...allEvents].reverse();
-            
+            activityFeed.classList.remove('bg-white/80', 'backdrop-blur-md', 'rounded-3xl', 'p-4', 'border-white', 'shadow-md');
+            activityFeed.classList.add('bg-transparent', 'shadow-none', 'border-transparent', 'p-0', 'space-y-3');
+
             let html = '';
-            reversedEvents.forEach(evt => {
-                const isON = evt.type === 'ON';
-                const iconBg = isON ? 'bg-blue-100 text-blue-600' : 'bg-slate-200 text-slate-500';
-                const iconClass = isON ? 'fa-fan' : 'fa-power-off';
-                const actionText = isON ? 'Turned ON' : 'Turned OFF';
-                const timeText = formatRelativeTime(evt.timestamp);
+            sessions.forEach(session => {
+                
+                let iconBg, iconClass, titleText, durationStr, durationColor;
+                
+                const onId = session.on ? session.on.id : 'null';
+                const offId = session.off ? session.off.id : 'null';
+
+                if (session.status === 'active') {
+                    iconBg = 'bg-blue-100 text-blue-600';
+                    iconClass = 'fa-fan animate-[spin_3s_linear_infinite]';
+                    
+                    const dateStr = formatRelativeTime(session.on.timestamp).split(',')[0];
+                    titleText = `${dateStr} • ${formatTimeOnly(session.on.timestamp)} - Now`;
+                    
+                    const durationHrs = (Date.now() - session.on.timestamp) / (1000 * 60 * 60);
+                    durationStr = `Running (${durationHrs.toFixed(1)} hrs)`;
+                    durationColor = 'text-blue-500';
+
+                } else if (session.status === 'completed') {
+                    iconBg = 'bg-slate-100 text-slate-500';
+                    iconClass = 'fa-clock';
+                    
+                    const dateStr = formatRelativeTime(session.on.timestamp).split(',')[0];
+                    titleText = `${dateStr} • ${formatTimeOnly(session.on.timestamp)} - ${formatTimeOnly(session.off.timestamp)}`;
+                    
+                    const durationHrs = (session.off.timestamp - session.on.timestamp) / (1000 * 60 * 60);
+                    durationStr = `${durationHrs.toFixed(2)} hrs`;
+                    durationColor = 'text-slate-500';
+
+                } else {
+                    iconBg = 'bg-red-50 text-red-400';
+                    iconClass = 'fa-power-off';
+                    titleText = `Unknown ON • Ended ${formatTimeOnly(session.off.timestamp)}`;
+                    durationStr = "Incomplete Session";
+                    durationColor = 'text-slate-400';
+                }
 
                 html += `
-                    <div class="flex items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-                        <div class="w-10 h-10 ${iconBg} rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                            <i class="fa-solid ${iconClass} text-sm"></i>
+                    <details class="group bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white overflow-hidden transition-all duration-300">
+                        <summary class="flex items-center p-3.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden hover:bg-white/90 transition-colors relative">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center mr-3.5 flex-shrink-0 ${iconBg}">
+                                <i class="fa-solid ${iconClass} text-sm"></i>
+                            </div>
+                            <div class="flex-1 min-w-0 pr-16">
+                                <p class="text-[13px] font-extrabold text-slate-800 truncate tracking-tight">
+                                    ${titleText}
+                                </p>
+                                <p class="text-xs font-bold mt-0.5 ${durationColor}">${durationStr}</p>
+                            </div>
+                            <div class="absolute right-10 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                <button class="delete-session-btn w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100" data-on-id="${onId}" data-off-id="${offId}" aria-label="Delete session">
+                                    <i class="fa-solid fa-trash-can text-sm pointer-events-none"></i>
+                                </button>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 group-open:rotate-180 absolute right-4 top-1/2 -translate-y-1/2"></i>
+                        </summary>
+                        <div class="p-4 bg-slate-50/50 border-t border-slate-100 space-y-3 text-sm">
+                            ${session.on ? `
+                                <div class="flex items-center gap-3 text-slate-600">
+                                    <div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                                    <span class="font-bold text-slate-700">${escapeHtml(session.on.user)}</span> 
+                                    <span class="text-slate-500">turned ON</span>
+                                    <span class="text-xs font-medium text-slate-400 ml-auto">${formatRelativeTime(session.on.timestamp)}</span>
+                                </div>
+                            ` : ''}
+                            ${session.off ? `
+                                <div class="flex items-center gap-3 text-slate-600">
+                                    <div class="w-2 h-2 rounded-full bg-slate-400"></div>
+                                    <span class="font-bold text-slate-700">${escapeHtml(session.off.user)}</span> 
+                                    <span class="text-slate-500">turned OFF</span>
+                                    <span class="text-xs font-medium text-slate-400 ml-auto">${formatRelativeTime(session.off.timestamp)}</span>
+                                </div>
+                            ` : ''}
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-slate-800 truncate">
-                                ${escapeHtml(evt.user)} <span class="font-normal text-slate-500">· ${actionText}</span>
-                            </p>
-                            <p class="text-xs text-slate-400 mt-0.5">${timeText}</p>
-                        </div>
-                    </div>
+                    </details>
                 `;
             });
             
@@ -862,14 +923,14 @@
                 const logger = escapeHtml(cycle.loggedBy || 'Unknown User');
 
                 html += `
-                    <div class="flex justify-between items-center bg-white p-3.5 rounded-xl shadow-sm border border-slate-100">
+                    <div class="flex justify-between items-center bg-slate-50/80 p-4 rounded-2xl border border-slate-100">
                         <div class="flex flex-col">
-                            <span class="text-[13px] font-bold text-slate-700 leading-tight">${startStr} <br><span class="text-slate-400 font-medium text-[11px] uppercase">to</span> ${endStr}</span>
-                            <span class="text-[11px] text-slate-500 mt-1.5 font-medium"><i class="fa-solid fa-user-pen mr-1 text-slate-400"></i> ${logger}</span>
+                            <span class="text-[13px] font-extrabold text-slate-700 leading-tight">${startStr} <br><span class="text-slate-400 font-bold text-[11px] uppercase">to</span> ${endStr}</span>
+                            <span class="text-[11px] text-slate-500 mt-1.5 font-bold"><i class="fa-solid fa-user-check mr-1 text-emerald-500"></i> ${logger}</span>
                         </div>
                         <div class="text-right flex flex-col items-end">
-                            <div class="font-black text-emerald-600 text-lg leading-none">₱${cost}</div>
-                            <div class="text-[11px] font-medium text-slate-400 mt-1 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">${hrs} hrs</div>
+                            <div class="font-black text-slate-800 text-xl leading-none tracking-tight">₱${cost}</div>
+                            <div class="text-[11px] font-extrabold text-slate-500 mt-1 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">${hrs} h</div>
                         </div>
                     </div>
                 `;
@@ -892,7 +953,7 @@
 
         openSettingsBtn.addEventListener('click', () => {
             rateInput.value = appConfig.meralcoRatePhp;
-            wattageInput.value = Math.round(appConfig.acPowerKw * 1000); // Convert kW back to Watts
+            wattageInput.value = Math.round(appConfig.acPowerKw * 1000); 
             
             settingsModal.classList.remove('opacity-0', 'pointer-events-none');
             setTimeout(() => settingsModalContent.classList.remove('scale-95'), 10);
@@ -916,18 +977,17 @@
             }
 
             saveSettingsBtn.disabled = true;
-            saveSettingsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            saveSettingsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             
             try {
                 const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_config', 'main');
                 await setDoc(configRef, { 
                     meralcoRatePhp: newRate,
-                    acPowerKw: newWattage / 1000 // Convert Watts to kW
+                    acPowerKw: newWattage / 1000 
                 }, { merge: true });
                 
                 closeSettingsModal();
             } catch (error) {
-                console.error("Error saving settings:", error);
                 showError("Failed to update settings.");
             } finally {
                 saveSettingsBtn.disabled = false;
@@ -946,14 +1006,64 @@
             }
         });
 
+        activityFeed.addEventListener('click', (e) => {
+            const btn = e.target.closest('.delete-session-btn');
+            if (btn) {
+                e.preventDefault(); 
+                sessionToDeleteIds = {
+                    on: btn.getAttribute('data-on-id'),
+                    off: btn.getAttribute('data-off-id')
+                };
+                deleteEventModal.classList.remove('opacity-0', 'pointer-events-none');
+                setTimeout(() => deleteEventModalContent.classList.remove('scale-95'), 10);
+            }
+        });
+
+        function closeDeleteEventModal() {
+            deleteEventModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                deleteEventModal.classList.add('opacity-0', 'pointer-events-none');
+                sessionToDeleteIds = { on: null, off: null };
+            }, 300);
+        }
+
+        cancelDeleteEventBtn.addEventListener('click', closeDeleteEventModal);
+
+        confirmDeleteEventBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+            
+            confirmDeleteEventBtn.disabled = true;
+            confirmDeleteEventBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            
+            try {
+                const promises = [];
+                if (sessionToDeleteIds.on && sessionToDeleteIds.on !== 'null') {
+                    promises.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ac_events', sessionToDeleteIds.on)));
+                }
+                if (sessionToDeleteIds.off && sessionToDeleteIds.off !== 'null') {
+                    promises.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ac_events', sessionToDeleteIds.off)));
+                }
+                
+                await Promise.all(promises);
+                closeDeleteEventModal();
+            } catch (error) {
+                showError("Failed to delete session.");
+            } finally {
+                confirmDeleteEventBtn.disabled = false;
+                confirmDeleteEventBtn.innerHTML = 'Delete';
+            }
+        });
+
         confirmResetBtn.addEventListener('click', async () => {
             if (!currentUser) return;
             
             confirmResetBtn.disabled = true;
-            confirmResetBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+            confirmResetBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             
             try {
                 const now = Date.now();
+                
+                updateStatsUI();
                 const stats = calculateUsageStats(allEvents);
                 
                 if (stats.rawCycleHrs > 0.01) {
@@ -972,11 +1082,10 @@
                 
                 closeResetModal();
             } catch (error) {
-                console.error("Error resetting cycle:", error);
                 showError("Failed to reset cycle.");
             } finally {
                 confirmResetBtn.disabled = false;
-                confirmResetBtn.innerHTML = 'Yes, Reset';
+                confirmResetBtn.innerHTML = 'Yes, Save it';
             }
         });
 
@@ -1000,8 +1109,7 @@
                 });
                 
             } catch (error) {
-                console.error("Error toggling AC:", error);
-                showError("Failed to update status. Check connection.");
+                showError("Failed to update status.");
             } finally {
                 isProcessingAction = false;
                 acToggleButton.classList.remove('opacity-80', 'scale-95');
@@ -1011,30 +1119,24 @@
         function formatRelativeTime(timestampMs) {
             const date = new Date(timestampMs);
             const now = new Date();
-            const diffMs = now - date;
-            const diffMins = Math.floor(diffMs / 60000);
             
             const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
             const timeStr = date.toLocaleTimeString([], timeOptions);
             
-            if (diffMins < 1) return 'Just now';
-            if (diffMins < 60) return `${diffMins} min ago`;
-            
-            const isToday = date.getDate() === now.getDate() && 
-                            date.getMonth() === now.getMonth() && 
-                            date.getFullYear() === now.getFullYear();
-                            
-            if (isToday) return `Today, ${timeStr}`;
-            
-            const yesterday = new Date(now);
-            yesterday.setDate(now.getDate() - 1);
-            const isYesterday = date.getDate() === yesterday.getDate() && 
-                                date.getMonth() === yesterday.getMonth() && 
-                                date.getFullYear() === yesterday.getFullYear();
-                                
-            if (isYesterday) return `Yesterday, ${timeStr}`;
-            
-            return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + `, ${timeStr}`;
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+            if (targetDate.getTime() === today.getTime()) {
+                return `Today, ${timeStr}`;
+            } else if (targetDate.getTime() === yesterday.getTime()) {
+                return `Yesterday, ${timeStr}`;
+            } else {
+                const dateOptions = { month: 'short', day: 'numeric' };
+                const dateStr = date.toLocaleDateString([], dateOptions);
+                return `${dateStr}, ${timeStr}`;
+            }
         }
 
         function escapeHtml(unsafe) {
@@ -1047,10 +1149,6 @@
         }
 
         function setupPWA() {
-            // Flat Vector SVG Icon encoded as a data URL for perfect offline scaling
-            const acIconSvgUrl = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%234f46e5' rx='112'/%3E%3Crect x='112' y='176' width='288' height='128' fill='%23ffffff' rx='24'/%3E%3Crect x='144' y='272' width='224' height='16' fill='%23c7d2fe' rx='8'/%3E%3Cline x1='152' y1='216' x2='304' y2='216' stroke='%23c7d2fe' stroke-width='16' stroke-linecap='round'/%3E%3Cline x1='152' y1='244' x2='304' y2='244' stroke='%23c7d2fe' stroke-width='16' stroke-linecap='round'/%3E%3Ccircle cx='360' cy='230' r='16' fill='%23c7d2fe'/%3E%3Cpath d='M160 352 Q180 392 200 352 M236 362 Q256 402 276 362 M312 352 Q332 392 352 352' fill='none' stroke='%23ffffff' stroke-width='16' stroke-linecap='round'/%3E%3C/svg%3E";
-
-            // 1. Generate a strict manifest that satisfies Android Chrome
             const manifest = {
                 "name": "Dorm AC Tracker",
                 "short_name": "AC Tracker",
@@ -1060,13 +1158,7 @@
                 "theme_color": "#4f46e5",
                 "icons": [
                     {
-                        "src": acIconSvgUrl,
-                        "sizes": "192x192",
-                        "type": "image/svg+xml",
-                        "purpose": "any maskable"
-                    },
-                    {
-                        "src": acIconSvgUrl,
+                        "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%232563eb' rx='112'/%3E%3Crect x='96' y='160' width='320' height='160' fill='%23ffffff' rx='32'/%3E%3Crect x='128' y='264' width='256' height='24' fill='%23dbeafe' rx='12'/%3E%3Cline x1='144' y1='208' x2='288' y2='208' stroke='%2393c5fd' stroke-width='16' stroke-linecap='round'/%3E%3Cline x1='144' y1='236' x2='240' y2='236' stroke='%2393c5fd' stroke-width='16' stroke-linecap='round'/%3E%3Ccircle cx='352' cy='212' r='20' fill='%233b82f6'/%3E%3Cpath d='M160 360 Q180 410 200 360 M256 370 Q276 420 296 370 M352 360 Q372 410 392 360' fill='none' stroke='%2360a5fa' stroke-width='24' stroke-linecap='round'/%3E%3C/svg%3E",
                         "sizes": "512x512",
                         "type": "image/svg+xml",
                         "purpose": "any maskable"
@@ -1076,19 +1168,14 @@
             const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
             document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
 
-            // 2. Generate and register a Service Worker (Required for Android Install Prompt)
             if ('serviceWorker' in navigator) {
-                // A minimal service worker that just listens for fetch events to pass the PWA check
                 const swCode = `
                     self.addEventListener('install', (event) => self.skipWaiting());
                     self.addEventListener('fetch', (event) => {});
                 `;
                 const swBlob = new Blob([swCode], { type: 'application/javascript' });
                 const swUrl = URL.createObjectURL(swBlob);
-                
-                navigator.serviceWorker.register(swUrl)
-                    .then(() => console.log("PWA Service Worker ready!"))
-                    .catch(err => console.error("PWA Service Worker failed:", err));
+                navigator.serviceWorker.register(swUrl).catch(()=>{});
             }
         }
 
@@ -1098,3 +1185,4 @@
     </script>
 </body>
 </html>
+```
