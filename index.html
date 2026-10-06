@@ -121,7 +121,7 @@
                         </span>
                         <div class="flex items-baseline gap-1">
                             <span class="text-2xl font-black text-slate-700 drop-shadow-sm">₱</span>
-                            <span id="statCost" class="text-4xl font-black text-slate-700 fluid-numbers transition-colors duration-300 drop-shadow-sm tracking-tight">0.0000</span>
+                            <span id="statCost" class="text-4xl font-black text-slate-700 fluid-numbers transition-colors duration-300 drop-shadow-sm tracking-tight">0.00</span>
                         </div>
                     </div>
                     <button id="openResetModalBtn" class="bg-gradient-to-tr from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm font-bold py-3 px-5 rounded-2xl shadow-[0_8px_20px_rgba(245,158,11,0.25)] border border-orange-400/50 transition-all active:scale-95 flex items-center gap-2 relative z-10">
@@ -734,7 +734,7 @@
             const stats = calculateUsageStats(allEvents);
             statToday.textContent = stats.today;
             statCycle.textContent = stats.cycle;
-            statCost.textContent = stats.cost;
+            statCost.textContent = isAcOn ? stats.rawCost.toFixed(4) : stats.rawCost.toFixed(2);
             resetConfirmCost.textContent = `₱${stats.rawCost.toFixed(2)}`; 
         }
 
@@ -784,6 +784,29 @@
 
         function formatTimeOnly(timestamp) {
             return new Date(timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        }
+
+        function formatRelativeTime(timestampMs) {
+            const date = new Date(timestampMs);
+            const now = new Date();
+            
+            const timeOptions = { hour: 'numeric', minute: '2-digit' };
+            const timeStr = date.toLocaleTimeString([], timeOptions);
+            
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+            if (targetDate.getTime() === today.getTime()) {
+                return `Today, ${timeStr}`;
+            } else if (targetDate.getTime() === yesterday.getTime()) {
+                return `Yesterday, ${timeStr}`;
+            } else {
+                const dateOptions = { month: 'short', day: 'numeric' };
+                const dateStr = date.toLocaleDateString([], dateOptions);
+                return `${dateStr}, ${timeStr}`;
+            }
         }
 
         function updateActivityFeed() {
@@ -1114,29 +1137,6 @@
                 acToggleButton.classList.remove('opacity-80', 'scale-95');
             }
         });
-
-        function formatRelativeTime(timestampMs) {
-            const date = new Date(timestampMs);
-            const now = new Date();
-            
-            const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
-            const timeStr = date.toLocaleTimeString([], timeOptions);
-            
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-            if (targetDate.getTime() === today.getTime()) {
-                return `Today, ${timeStr}`;
-            } else if (targetDate.getTime() === yesterday.getTime()) {
-                return `Yesterday, ${timeStr}`;
-            } else {
-                const dateOptions = { month: 'short', day: 'numeric' };
-                const dateStr = date.toLocaleDateString([], dateOptions);
-                return `${dateStr}, ${timeStr}`;
-            }
-        }
 
         function escapeHtml(unsafe) {
             return (unsafe || '').toString()
