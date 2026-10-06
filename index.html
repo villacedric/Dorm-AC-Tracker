@@ -183,12 +183,20 @@
                     <i class="fa-solid fa-user-astronaut text-2xl text-indigo-600 drop-shadow-sm"></i>
                 </div>
                 <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Who's tracking?</h2>
-                <p class="text-sm text-slate-500 mt-1">Enter your name so your dormmates know who turned the AC on or off.</p>
+                <p class="text-sm text-slate-500 mt-1">Select your name so your dormmates know who turned the AC on or off.</p>
             </div>
-            <input type="text" id="nameInput" placeholder="e.g., Alex, Room 2B..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-center mb-4 relative z-10 shadow-inner">
-            <button id="saveNameBtn" class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold py-3.5 rounded-2xl transition-all shadow-[0_8px_20px_rgba(59,130,246,0.3)] active:scale-95 relative z-10">
-                Save & Continue
-            </button>
+            
+            <div class="flex flex-col gap-3 relative z-10 mb-2">
+                <button class="name-select-btn bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 hover:border-indigo-300 font-extrabold text-lg py-3.5 rounded-2xl transition-all shadow-inner active:scale-95" data-name="Cedric">
+                    Cedric
+                </button>
+                <button class="name-select-btn bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 hover:border-indigo-300 font-extrabold text-lg py-3.5 rounded-2xl transition-all shadow-inner active:scale-95" data-name="Jed">
+                    Jed
+                </button>
+                <button class="name-select-btn bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 hover:border-indigo-300 font-extrabold text-lg py-3.5 rounded-2xl transition-all shadow-inner active:scale-95" data-name="Ants">
+                    Ants
+                </button>
+            </div>
         </div>
     </div>
 
@@ -396,12 +404,21 @@
         };
         let billingHistory = [];
 
+        // Profanity filter and data corrector
+        function sanitizeName(name) {
+            if (!name) return 'Unknown User';
+            const lower = name.toLowerCase();
+            // Automatically correct the specific offensive name to "Jed"
+            if (lower.includes('nigger') || lower.includes('nigga')) {
+                return 'Jed';
+            }
+            return name;
+        }
+
         // UI Elements
         const loadingOverlay = document.getElementById('loadingOverlay');
         const nameModal = document.getElementById('nameModal');
         const nameModalContent = document.getElementById('nameModalContent');
-        const nameInput = document.getElementById('nameInput');
-        const saveNameBtn = document.getElementById('saveNameBtn');
         const editNameBtn = document.getElementById('editNameBtn');
         const headerUserName = document.getElementById('headerUserName');
         
@@ -526,8 +543,16 @@
             return new Promise((resolve) => {
                 onSnapshot(profileRef, (docSnap) => {
                     if (docSnap.exists() && docSnap.data().name) {
-                        userProfile.name = docSnap.data().name;
-                        headerUserName.textContent = userProfile.name;
+                        let fetchedName = docSnap.data().name;
+                        
+                        // Silently auto-fix their database profile if they have the offensive name
+                        if (fetchedName.toLowerCase().includes('nigger') || fetchedName.toLowerCase().includes('nigga')) {
+                            fetchedName = 'Jed';
+                            setDoc(profileRef, { name: 'Jed' }, { merge: true });
+                        }
+                        
+                        userProfile.name = fetchedName;
+                        headerUserName.textContent = sanitizeName(userProfile.name);
                     } else {
                         showNameModal();
                         headerUserName.textContent = `User ${currentUser.uid.substring(0,4)}`;
@@ -541,12 +566,10 @@
         }
 
         function showNameModal() {
-            nameInput.value = userProfile.name.startsWith('User ') ? '' : userProfile.name;
             nameModal.classList.remove('opacity-0', 'pointer-events-none');
             setTimeout(() => {
                 nameModalContent.classList.remove('scale-95');
                 nameModalContent.classList.add('scale-100');
-                nameInput.focus();
             }, 10);
         }
 
@@ -558,23 +581,29 @@
             }, 300);
         }
 
-        saveNameBtn.addEventListener('click', async () => {
-            const name = nameInput.value.trim();
-            if (!name) return showError("Please enter a name");
-            
-            saveNameBtn.disabled = true;
-            saveNameBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-            
-            try {
-                const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid);
-                await setDoc(profileRef, { name: name }, { merge: true });
-                hideNameModal();
-            } catch (error) {
-                showError("Could not save name.");
-            } finally {
-                saveNameBtn.disabled = false;
-                saveNameBtn.innerHTML = 'Save & Continue';
-            }
+        // Handle the 3 distinct user buttons instead of a text input
+        document.querySelectorAll('.name-select-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const selectedName = e.target.getAttribute('data-name');
+                const originalText = e.target.textContent;
+                
+                // Visual loading state for the clicked button
+                document.querySelectorAll('.name-select-btn').forEach(b => b.classList.add('opacity-50', 'pointer-events-none'));
+                e.target.classList.remove('opacity-50');
+                e.target.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                
+                try {
+                    const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid);
+                    await setDoc(profileRef, { name: selectedName }, { merge: true });
+                    hideNameModal();
+                } catch (error) {
+                    showError("Could not save name.");
+                } finally {
+                    // Reset buttons
+                    document.querySelectorAll('.name-select-btn').forEach(b => b.classList.remove('opacity-50', 'pointer-events-none'));
+                    e.target.textContent = originalText.trim();
+                }
+            });
         });
 
         editNameBtn.addEventListener('click', showNameModal);
@@ -779,7 +808,7 @@
                 }
 
                 if (currentOnEvent) {
-                    acLastAction.innerHTML = `Running • Turned ON by <span class="font-bold text-slate-800">${escapeHtml(currentOnEvent.user)}</span>`;
+                    acLastAction.innerHTML = `Running • Turned ON by <span class="font-bold text-slate-800">${escapeHtml(sanitizeName(currentOnEvent.user))}</span>`;
                 }
             } else {
                 snowCanvas.classList.remove('opacity-100');
@@ -814,7 +843,7 @@
                 }
 
                 if (lastEvent && lastEvent.type === 'OFF') {
-                    acLastAction.innerHTML = `Turned OFF by <span class="font-bold text-slate-700">${escapeHtml(lastEvent.user)}</span>`;
+                    acLastAction.innerHTML = `Turned OFF by <span class="font-bold text-slate-700">${escapeHtml(sanitizeName(lastEvent.user))}</span>`;
                 } else {
                     acLastAction.innerHTML = "AC is currently OFF";
                 }
@@ -1007,7 +1036,7 @@
                             ${session.on ? `
                                 <div class="flex items-center gap-3 text-slate-600">
                                     <div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-                                    <span class="font-bold text-slate-700">${escapeHtml(session.on.user)}</span> 
+                                    <span class="font-bold text-slate-700">${escapeHtml(sanitizeName(session.on.user))}</span> 
                                     <span class="text-slate-500">turned ON</span>
                                     <span class="text-xs font-medium text-slate-400 ml-auto">${formatRelativeTime(session.on.timestamp)}</span>
                                 </div>
@@ -1015,7 +1044,7 @@
                             ${session.off ? `
                                 <div class="flex items-center gap-3 text-slate-600">
                                     <div class="w-2 h-2 rounded-full bg-slate-400"></div>
-                                    <span class="font-bold text-slate-700">${escapeHtml(session.off.user)}</span> 
+                                    <span class="font-bold text-slate-700">${escapeHtml(sanitizeName(session.off.user))}</span> 
                                     <span class="text-slate-500">turned OFF</span>
                                     <span class="text-xs font-medium text-slate-400 ml-auto">${formatRelativeTime(session.off.timestamp)}</span>
                                 </div>
@@ -1045,7 +1074,7 @@
                 
                 const cost = parseFloat(cycle.totalCost || 0).toFixed(2);
                 const hrs = parseFloat(cycle.totalHours || 0).toFixed(1);
-                const logger = escapeHtml(cycle.loggedBy || 'Unknown User');
+                const logger = escapeHtml(sanitizeName(cycle.loggedBy || 'Unknown User'));
 
                 html += `
                     <div class="flex justify-between items-center bg-slate-50/80 p-4 rounded-2xl border border-slate-100">
