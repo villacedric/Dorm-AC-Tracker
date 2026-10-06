@@ -96,7 +96,10 @@
 
             <!-- Stats Dashboard -->
             <div class="grid grid-cols-2 gap-4 relative z-10">
-                <div class="bg-gradient-to-br from-white to-blue-50/50 rounded-3xl p-5 flex flex-col items-center justify-center border border-white shadow-md relative overflow-hidden backdrop-blur-md">
+                <div id="todayStatPanel" class="bg-gradient-to-br from-white to-blue-50/50 rounded-3xl p-5 flex flex-col items-center justify-center border border-white shadow-md relative overflow-hidden backdrop-blur-md cursor-pointer hover:shadow-lg hover:from-white hover:to-blue-100/60 transition-all duration-300 transform active:scale-95 group">
+                    <div class="absolute top-3 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <i class="fa-solid fa-chart-column text-blue-400"></i>
+                    </div>
                     <div class="absolute -top-6 -right-6 w-24 h-24 bg-blue-400/10 rounded-full blur-2xl"></div>
                     <span class="text-[10px] font-extrabold text-blue-500 uppercase tracking-widest mb-1 relative z-10 opacity-80">Today</span>
                     <div class="flex items-baseline gap-1 relative z-10">
@@ -104,7 +107,10 @@
                         <span class="text-sm font-bold text-slate-400">h</span>
                     </div>
                 </div>
-                <div class="bg-gradient-to-br from-white to-indigo-50/50 rounded-3xl p-5 flex flex-col items-center justify-center border border-white shadow-md relative overflow-hidden backdrop-blur-md">
+                <div id="cycleStatPanel" class="bg-gradient-to-br from-white to-indigo-50/50 rounded-3xl p-5 flex flex-col items-center justify-center border border-white shadow-md relative overflow-hidden backdrop-blur-md cursor-pointer hover:shadow-lg hover:from-white hover:to-indigo-100/60 transition-all duration-300 transform active:scale-95 group">
+                    <div class="absolute top-3 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <i class="fa-solid fa-chart-line text-indigo-400"></i>
+                    </div>
                     <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-indigo-400/10 rounded-full blur-2xl"></div>
                     <span class="text-[10px] font-extrabold text-indigo-500 uppercase tracking-widest mb-1 relative z-10 opacity-80">Cycle Total</span>
                     <div class="flex items-baseline gap-1 relative z-10">
@@ -256,6 +262,76 @@
         </div>
     </div>
 
+    <!-- Today's Graph Modal -->
+    <div id="graphModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <div class="bg-white rounded-[2rem] shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white relative overflow-hidden" id="graphModalContent">
+            <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-50 to-transparent pointer-events-none"></div>
+            
+            <div class="flex justify-between items-start mb-6 relative z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full flex items-center justify-center shadow-inner">
+                        <i class="fa-solid fa-chart-column text-xl text-blue-600 drop-shadow-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-800 leading-tight tracking-tight">Today's Usage</h2>
+                        <p class="text-xs text-slate-500 font-medium">Hourly breakdown</p>
+                    </div>
+                </div>
+                <button id="closeGraphBtn" class="text-slate-400 hover:text-slate-600 p-2 bg-slate-50 rounded-full transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <!-- Graph Container -->
+            <div class="relative z-10 mb-2">
+                <div class="flex items-end justify-between h-32 border-b border-slate-200 pb-1 gap-[2px]" id="hourlyGraphContainer">
+                    <!-- Bars will be injected here -->
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 font-bold mt-2 px-1">
+                    <span>12A</span><span>6A</span><span>12P</span><span>6P</span><span>11P</span>
+                </div>
+            </div>
+            <div class="mt-4 text-center relative z-10">
+                <span class="text-sm font-extrabold text-slate-600 tracking-tight" id="graphTotalText">Total: 0.00 hours</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cycle's Graph Modal -->
+    <div id="cycleGraphModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <div class="bg-white rounded-[2rem] shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white relative overflow-hidden" id="cycleGraphModalContent">
+            <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-transparent pointer-events-none"></div>
+            
+            <div class="flex justify-between items-start mb-6 relative z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center shadow-inner">
+                        <i class="fa-solid fa-chart-line text-xl text-indigo-600 drop-shadow-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-800 leading-tight tracking-tight">Cycle Usage</h2>
+                        <p class="text-xs text-slate-500 font-medium">Daily breakdown</p>
+                    </div>
+                </div>
+                <button id="closeCycleGraphBtn" class="text-slate-400 hover:text-slate-600 p-2 bg-slate-50 rounded-full transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <!-- Graph Container -->
+            <div class="relative z-10 mb-2">
+                <div class="flex items-end justify-between h-32 border-b border-slate-200 pb-1 gap-[2px] overflow-x-auto overflow-y-hidden" id="dailyGraphContainer">
+                    <!-- Bars will be injected here -->
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 font-bold mt-2 px-1" id="dailyGraphLabels">
+                    <!-- Labels injected here -->
+                </div>
+            </div>
+            <div class="mt-4 text-center relative z-10">
+                <span class="text-sm font-extrabold text-slate-600 tracking-tight" id="cycleGraphTotalText">Total: 0.00 hours</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Session Confirmation Modal -->
     <div id="deleteEventModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
         <div class="bg-white rounded-[2rem] shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300 border border-white relative overflow-hidden" id="deleteEventModalContent">
@@ -336,6 +412,21 @@
         const saveSettingsBtn = document.getElementById('saveSettingsBtn');
         const rateInput = document.getElementById('rateInput');
         const wattageInput = document.getElementById('wattageInput');
+        
+        const todayStatPanel = document.getElementById('todayStatPanel');
+        const graphModal = document.getElementById('graphModal');
+        const graphModalContent = document.getElementById('graphModalContent');
+        const closeGraphBtn = document.getElementById('closeGraphBtn');
+        const hourlyGraphContainer = document.getElementById('hourlyGraphContainer');
+        const graphTotalText = document.getElementById('graphTotalText');
+        
+        const cycleStatPanel = document.getElementById('cycleStatPanel');
+        const cycleGraphModal = document.getElementById('cycleGraphModal');
+        const cycleGraphModalContent = document.getElementById('cycleGraphModalContent');
+        const closeCycleGraphBtn = document.getElementById('closeCycleGraphBtn');
+        const dailyGraphContainer = document.getElementById('dailyGraphContainer');
+        const cycleGraphTotalText = document.getElementById('cycleGraphTotalText');
+        const dailyGraphLabels = document.getElementById('dailyGraphLabels');
         
         const acToggleButton = document.getElementById('acToggleButton');
         const acIcon = document.getElementById('acIcon');
@@ -734,8 +825,20 @@
             const stats = calculateUsageStats(allEvents);
             statToday.textContent = stats.today;
             statCycle.textContent = stats.cycle;
-            statCost.textContent = isAcOn ? stats.rawCost.toFixed(4) : stats.rawCost.toFixed(2);
+            
+            if (isAcOn) {
+                statCost.textContent = stats.rawCost.toFixed(4);
+            } else {
+                statCost.textContent = stats.rawCost.toFixed(2);
+            }
             resetConfirmCost.textContent = `₱${stats.rawCost.toFixed(2)}`; 
+            
+            if (!graphModal.classList.contains('opacity-0')) {
+                renderHourlyGraph();
+            }
+            if (!cycleGraphModal.classList.contains('opacity-0')) {
+                renderDailyGraph();
+            }
         }
 
         function calculateUsageStats(events) {
@@ -987,6 +1090,192 @@
         }
 
         closeSettingsBtn.addEventListener('click', closeSettingsModal);
+
+        // Chart/Graph Modal Logic
+        todayStatPanel.addEventListener('click', () => {
+            renderHourlyGraph();
+            graphModal.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => graphModalContent.classList.remove('scale-95'), 10);
+        });
+
+        closeGraphBtn.addEventListener('click', () => {
+            graphModalContent.classList.add('scale-95');
+            setTimeout(() => graphModal.classList.add('opacity-0', 'pointer-events-none'), 300);
+        });
+
+        cycleStatPanel.addEventListener('click', () => {
+            renderDailyGraph();
+            cycleGraphModal.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => cycleGraphModalContent.classList.remove('scale-95'), 10);
+        });
+
+        closeCycleGraphBtn.addEventListener('click', () => {
+            cycleGraphModalContent.classList.add('scale-95');
+            setTimeout(() => cycleGraphModal.classList.add('opacity-0', 'pointer-events-none'), 300);
+        });
+
+        function renderDailyGraph() {
+            const now = Date.now();
+            
+            let cycleStart = appConfig.lastResetTimestamp;
+            if (!cycleStart || cycleStart === 0) {
+                cycleStart = allEvents.length > 0 ? allEvents[0].timestamp : now;
+            }
+
+            const startOfCycleDate = new Date(cycleStart);
+            startOfCycleDate.setHours(0, 0, 0, 0);
+            const cycleStartMidnight = startOfCycleDate.getTime();
+
+            const endOfTodayDate = new Date();
+            endOfTodayDate.setHours(23, 59, 59, 999);
+            const cycleEnd = endOfTodayDate.getTime();
+            
+            const msPerDay = 1000 * 60 * 60 * 24;
+            let numDays = Math.floor((cycleEnd - cycleStartMidnight) / msPerDay) + 1;
+            
+            const MAX_DAYS = 60;
+            let offsetDays = 0;
+            if (numDays > MAX_DAYS) {
+                offsetDays = numDays - MAX_DAYS;
+                numDays = MAX_DAYS;
+            }
+
+            let dailyHours = new Array(numDays).fill(0);
+            let dayDates = new Array(numDays);
+
+            for (let i = 0; i < numDays; i++) {
+                dayDates[i] = new Date(cycleStartMidnight + ((i + offsetDays) * msPerDay));
+            }
+
+            let activeStart = null;
+            const processOverlap = (start, end) => {
+                for (let i = 0; i < numDays; i++) {
+                    let dayStartWindow = dayDates[i].getTime();
+                    let dayEndWindow = dayStartWindow + msPerDay;
+                    let trueStartWindow = Math.max(dayStartWindow, cycleStart);
+                    let overlap = getOverlap(start, end, trueStartWindow, dayEndWindow);
+                    dailyHours[i] += overlap / (1000 * 60 * 60); 
+                }
+            };
+
+            allEvents.forEach(evt => {
+                if (evt.type === 'ON') activeStart = evt.timestamp;
+                else if (evt.type === 'OFF' && activeStart) {
+                    processOverlap(activeStart, evt.timestamp);
+                    activeStart = null;
+                }
+            });
+            
+            if (activeStart) {
+                processOverlap(activeStart, now);
+            }
+
+            let totalHrs = dailyHours.reduce((a, b) => a + b, 0);
+            cycleGraphTotalText.textContent = `Total: ${totalHrs.toFixed(2)} hours`;
+
+            let html = '';
+            let maxDaily = Math.max(...dailyHours, 8); 
+
+            for (let i = 0; i < numDays; i++) {
+                const hrs = dailyHours[i];
+                const heightPercent = (hrs / maxDaily) * 100;
+                
+                const dDate = dayDates[i];
+                const isToday = dDate.getDate() === new Date().getDate() && dDate.getMonth() === new Date().getMonth();
+                
+                let barClass = isToday ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'bg-indigo-300';
+                if (hrs === 0) barClass = 'bg-slate-100';
+                
+                const dateOptions = { month: 'short', day: 'numeric' };
+                const dateStr = dDate.toLocaleDateString('en-US', dateOptions);
+                
+                html += `
+                    <div class="flex-1 flex flex-col justify-end h-full relative group cursor-crosshair min-w-[10px]">
+                        <div class="w-full ${barClass} rounded-t-sm transition-all duration-500" style="height: ${hrs > 0 ? Math.max(heightPercent, 3) : 0}%"></div>
+                        
+                        <!-- Tooltip -->
+                        <div class="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-20 whitespace-nowrap">
+                            ${dateStr}: ${hrs.toFixed(1)}h
+                        </div>
+                    </div>
+                `;
+            }
+            
+            dailyGraphContainer.innerHTML = html;
+
+            if (numDays > 0) {
+                const startStr = dayDates[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const endStr = dayDates[numDays - 1].toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                let midStr = '';
+                if (numDays > 3) {
+                    midStr = dayDates[Math.floor(numDays / 2)].toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                }
+                dailyGraphLabels.innerHTML = `<span>${startStr}</span><span>${midStr}</span><span>${endStr}</span>`;
+            } else {
+                dailyGraphLabels.innerHTML = '';
+            }
+        }
+
+        function renderHourlyGraph() {
+            const now = new Date();
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            let hourlyMins = new Array(24).fill(0);
+
+            let activeStart = null;
+            const processOverlap = (start, end) => {
+                for (let i = 0; i < 24; i++) {
+                    let hourStart = startOfToday + (i * 3600000);
+                    let hourEnd = hourStart + 3600000;
+                    // Ensure we don't calculate time from before the last billing cycle reset
+                    let overlap = getOverlap(start, end, Math.max(hourStart, appConfig.lastResetTimestamp), hourEnd);
+                    hourlyMins[i] += overlap / 60000; 
+                }
+            };
+
+            allEvents.forEach(evt => {
+                if (evt.type === 'ON') activeStart = evt.timestamp;
+                else if (evt.type === 'OFF' && activeStart) {
+                    processOverlap(activeStart, evt.timestamp);
+                    activeStart = null;
+                }
+            });
+            
+            if (activeStart) {
+                processOverlap(activeStart, Date.now());
+            }
+
+            let totalMins = hourlyMins.reduce((a, b) => a + b, 0);
+            graphTotalText.textContent = `Total: ${(totalMins / 60).toFixed(2)} hours`;
+
+            let html = '';
+            const currentHour = now.getHours();
+            
+            for (let i = 0; i < 24; i++) {
+                const mins = hourlyMins[i];
+                const heightPercent = (mins / 60) * 100;
+                const isCurrent = i === currentHour;
+                
+                let barClass = isCurrent ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-cyan-400';
+                if (mins === 0) barClass = 'bg-slate-100';
+                
+                // Convert 24hr to 12hr for tooltip
+                const displayHour = i === 0 ? 12 : (i > 12 ? i - 12 : i);
+                const ampm = i >= 12 ? 'PM' : 'AM';
+                
+                html += `
+                    <div class="flex-1 flex flex-col justify-end h-full relative group cursor-crosshair">
+                        <div class="w-full ${barClass} rounded-t-sm transition-all duration-500" style="height: ${mins > 0 ? Math.max(heightPercent, 3) : 0}%"></div>
+                        
+                        <!-- Tooltip (Shows on touch/hover) -->
+                        <div class="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-20 whitespace-nowrap">
+                            ${displayHour}${ampm}: ${Math.round(mins)}m
+                        </div>
+                    </div>
+                `;
+            }
+            
+            hourlyGraphContainer.innerHTML = html;
+        }
 
         saveSettingsBtn.addEventListener('click', async () => {
             if (!currentUser) return;
